@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Entrar · ToDo</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --background: #f6f6f4;
+      --surface: #ffffff;
+      --text: #171717;
+      --muted: #73716d;
+      --line: #e2e0db;
+      --accent: #111111;
+      --danger: #b42318;
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: var(--background);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .login-card {
+      width: min(420px, 100%);
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--surface);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+      letter-spacing: -0.04em;
+    }
+
+    p {
+      margin: 0 0 24px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    form {
+      display: grid;
+      gap: 16px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    input {
+      width: 100%;
+      min-height: 48px;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      font: inherit;
+      font-size: 16px;
+      outline: none;
+    }
+
+    input:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    button {
+      min-height: 48px;
+      margin-top: 4px;
+      padding: 11px 16px;
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: wait;
+    }
+
+    .message {
+      min-height: 22px;
+      margin: 0;
+      color: var(--danger);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <main class="login-card">
+    <h1>ToDo</h1>
+    <p>Entre para acessar suas tarefas.</p>
+
+    <form id="login-form">
+      <label>
+        Usuário
+        <input id="username" name="username" type="text" autocomplete="username" required autofocus>
+      </label>
+
+      <label>
+        Senha
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+      </label>
+
+      <button id="submit-button" type="submit">Entrar</button>
+      <p class="message" id="message" role="alert" aria-live="polite"></p>
+    </form>
+  </main>
+
+  <script>
+    const form = document.querySelector('#login-form');
+    const usernameInput = document.querySelector('#username');
+    const passwordInput = document.querySelector('#password');
+    const submitButton = document.querySelector('#submit-button');
+    const message = document.querySelector('#message');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      message.textContent = '';
+      submitButton.disabled = true;
+      submitButton.textContent = 'Entrando...';
+
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+          },
+          body: JSON.stringify({
+            username: usernameInput.value.trim(),
+            password: passwordInput.value
+          })
+        });
+
+        if (response.ok) {
+          window.location.replace('/');
+          return;
+        }
+
+        if (response.status === 429) {
+          message.textContent = 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
+          return;
+        }
+
+        message.textContent = 'Usuário ou senha inválidos.';
+        passwordInput.value = '';
+        passwordInput.focus();
+      } catch (error) {
+        message.textContent = 'Não foi possível conectar ao servidor.';
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Entrar';
+      }
+    });
+  </script>
+</body>
+</html>

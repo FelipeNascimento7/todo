@@ -1,0 +1,5161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>ToDo</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --background: #f6f6f4;
+      --surface: #ffffff;
+      --surface-muted: #f0f0ed;
+      --text: #171717;
+      --muted: #73716d;
+      --line: #e2e0db;
+      --accent: #111111;
+      --accent-soft: #eeeeea;
+      --danger: #b42318;
+      --danger-soft: #fff4f2;
+      --placeholder: #9a9791;
+      --nav-background: rgba(246, 246, 244, 0.92);
+      --modal-shade: rgba(23, 23, 23, 0.42);
+      --radius: 16px;
+      --tap-size: 44px;
+      --content-width: 720px;
+    }
+
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --background: #111111;
+      --surface: #171717;
+      --surface-muted: #24231f;
+      --text: #f6f6f4;
+      --muted: #e2e0db;
+      --line: #73716d;
+      --accent: #f6f6f4;
+      --accent-soft: #2f2e2a;
+      --danger: #ff766b;
+      --danger-soft: rgba(255, 118, 107, 0.14);
+      --placeholder: #aaa7a1;
+      --nav-background: rgba(17, 17, 17, 0.92);
+      --modal-shade: rgba(0, 0, 0, 0.64);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      background: var(--background);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100svh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.45;
+      background: var(--background);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+      font-size: 16px;
+    }
+
+    button,
+    input,
+    label {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button {
+      touch-action: manipulation;
+    }
+
+    .app {
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-tabs {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      padding: calc(10px + env(safe-area-inset-top)) max(16px, env(safe-area-inset-left)) 10px max(16px, env(safe-area-inset-right));
+      background: var(--nav-background);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .tab-button {
+      min-width: 128px;
+      min-height: var(--tap-size);
+      padding: 10px 14px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 140ms ease, color 140ms ease;
+    }
+
+    .tab-button:hover {
+      background: var(--accent-soft);
+      color: var(--text);
+    }
+
+    .tab-button.active {
+      background: var(--accent);
+      color: var(--surface);
+    }
+
+    .mobile-tab-current,
+    .mobile-tab-menu-button,
+    .mobile-tab-menu {
+      display: none;
+    }
+
+    main {
+      width: min(var(--content-width), 100%);
+      margin: 0 auto;
+      padding: 34px 20px 56px;
+      flex: 1;
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.8rem, 6vw, 2.45rem);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+    }
+
+    h2 {
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      max-width: 620px;
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .task-composer {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      width: 100%;
+      margin: 24px 0 18px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 6px);
+      background: var(--surface);
+    }
+
+    .task-input {
+      width: 100%;
+      min-height: var(--tap-size);
+      padding: 10px 12px;
+      border: 0;
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--text);
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .task-input::placeholder,
+    .due-date-input::placeholder,
+    .task-name-input::placeholder,
+    .task-select::placeholder,
+        .task-blocks-input::placeholder,
+    .block-duration-input::placeholder {
+      color: var(--placeholder);
+    }
+
+    .task-input:focus,
+    .due-date-input:focus,
+    .task-name-input:focus,
+    .task-select:focus,
+        .task-blocks-input:focus,
+    .block-duration-input:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .add-button,
+    .save-due-button,
+    .save-name-button,
+    .save-useful-time-button,
+    .export-button,
+    .danger-button,
+    .cancel-button,
+    .confirm-delete-button {
+      min-height: var(--tap-size);
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+
+    .add-button,
+    .save-due-button,
+    .save-name-button,
+    .save-useful-time-button,
+    .export-button {
+      background: var(--accent);
+      color: var(--surface);
+      border-color: var(--accent);
+    }
+
+    .add-button:hover,
+    .save-due-button:hover,
+    .save-name-button:hover,
+    .save-useful-time-button:hover,
+    .export-button:hover {
+      opacity: 0.88;
+    }
+
+    .planning-toolbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      margin-top: 16px;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 38px;
+      color: var(--muted);
+      font-size: 0.93rem;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-actions,
+    .settings-actions,
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-actions {
+      justify-content: flex-end;
+      flex: 0 0 auto;
+    }
+
+    .breadcrumb-button,
+    .delete-current-button {
+      min-height: 38px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .breadcrumb-button.active {
+      border-color: transparent;
+      background: transparent;
+      color: var(--text);
+      font-weight: 800;
+      cursor: default;
+    }
+
+    .breadcrumb-button.active.editable {
+      border-color: var(--line);
+      background: var(--surface);
+      cursor: pointer;
+    }
+
+    .breadcrumb-button.active.editable:hover {
+      background: var(--accent-soft);
+    }
+
+    .delete-current-button {
+      display: none;
+      border-color: var(--danger);
+      color: var(--danger);
+      font-weight: 800;
+    }
+
+    .delete-current-button.visible {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .delete-current-button:hover {
+      background: var(--danger-soft);
+    }
+
+    .task-list,
+    .today-list {
+      display: grid;
+      gap: 10px;
+      margin: 16px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .task-card,
+    .today-card {
+      width: 100%;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      align-items: stretch;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 2px);
+      background: var(--surface);
+    }
+
+    /* Destaque permanente do bloco especial ROTINA. */
+    .task-card.routine-task-card {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      box-shadow: inset 4px 0 0 var(--accent);
+    }
+
+    .task-card.routine-task-card .task-title {
+      font-weight: 900;
+    }
+
+    .task-title {
+      width: 100%;
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      padding: 13px 14px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: var(--text);
+      font-weight: 750;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .task-title-content {
+      min-width: 0;
+      min-height: 54px;
+      flex: 1 1 auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .task-title-text {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+
+    .task-name-has-subtasks {
+      font-weight: 900 !important;
+    }
+    .task-estimate {
+      flex: 0 0 auto;
+      min-height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: auto;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: var(--surface);
+      font-size: 0.82rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .task-title.has-status .task-estimate {
+      margin-left: 0;
+    }
+
+
+    .delete-button,
+    .edit-button,
+    .today-action {
+      min-width: var(--tap-size);
+      min-height: 54px;
+      padding: 12px;
+      border: 0;
+      border-left: 1px solid var(--line);
+      background: transparent;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .delete-button {
+      color: var(--danger);
+    }
+
+    .delete-button:hover {
+      background: var(--danger-soft);
+    }
+
+    .edit-button {
+      color: var(--accent);
+    }
+
+    .edit-button:hover {
+      background: var(--accent-soft);
+    }
+
+    .task-days {
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 10px 12px;
+      border-left: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 800;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .task-days.due-today,
+    .task-days.overdue {
+      color: var(--danger);
+    }
+
+    .due-checkbox-wrap {
+      min-height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .due-checkbox {
+      width: 22px;
+      height: 22px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .task-title::after {
+      content: attr(data-status);
+      flex: 0 0 auto;
+      min-width: 76px;
+      min-height: 28px;
+      margin-left: auto;
+      padding: 4px 8px;
+      display: none;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--surface-muted);
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .task-title.has-status::after {
+      display: grid;
+      align-self: center;
+    }
+
+    .empty-state,
+    .today-empty {
+      color: var(--muted);
+      font-size: 0.95rem;
+      padding: 4px 0;
+    }
+
+    .today-layout {
+      display: grid;
+      gap: 26px;
+      width: 100%;
+      margin-top: 28px;
+    }
+
+    .today-day-tools {
+      display: grid;
+      gap: 6px;
+      width: 100%;
+      margin-top: 18px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 2px);
+      background: var(--surface);
+    }
+
+    .today-time-summary {
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    .today-progress-wrap {
+      display: grid;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .today-progress-bar {
+      width: 100%;
+      min-height: 14px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface-muted);
+    }
+
+    .today-progress-fill {
+      width: 0%;
+      height: 100%;
+      min-height: 14px;
+      border-radius: inherit;
+      background: var(--accent);
+      transition: width 180ms ease;
+    }
+
+    .today-progress-fill.over-limit {
+      background: var(--danger);
+    }
+
+    .today-time-progress {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .report-dialog {
+      width: min(560px, 100%);
+    }
+
+    .report-table-wrap {
+      width: 100%;
+      margin: 16px 0 18px;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .report-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+
+    .report-table th,
+    .report-table td {
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .report-table th {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: var(--surface-muted);
+    }
+
+    .report-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .report-table td:last-child,
+    .report-table th:last-child {
+      text-align: right;
+    }
+
+    .report-empty {
+      color: var(--muted);
+      text-align: center !important;
+      white-space: normal !important;
+    }
+
+    .report-percent {
+      font-weight: 900;
+    }
+
+    .calendar-dialog {
+      width: min(1180px, 96vw);
+    }
+
+    .calendar-tab {
+      width: min(1180px, calc(100vw - 40px));
+      max-width: none;
+      margin-left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .calendar-tab .calendar-list {
+      max-height: none;
+    }
+
+    .calendar-toolbar {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .calendar-nav-button {
+      min-height: var(--tap-size);
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .calendar-nav-button:hover {
+      background: var(--accent-soft);
+    }
+
+    .calendar-week-label {
+      min-width: 0;
+      color: var(--text);
+      font-weight: 900;
+      text-align: center;
+      line-height: 1.25;
+    }
+
+    .calendar-list {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(145px, 1fr));
+      gap: 10px;
+      width: 100%;
+      max-height: min(62dvh, 560px);
+      margin: 14px 0 18px;
+      padding-bottom: 4px;
+      overflow: auto;
+    }
+
+    .calendar-day {
+      min-width: 0;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .calendar-day.is-today {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+
+    .calendar-weekday {
+      display: block;
+      color: var(--text);
+      font-size: 0.84rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .calendar-date {
+      display: block;
+      margin: 2px 0 12px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .calendar-task-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .calendar-task {
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface-muted);
+    }
+
+    .calendar-task-title {
+      display: block;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 800;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .calendar-task-meta {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .calendar-empty {
+      padding: 12px 4px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-align: center;
+    }
+
+    .queue-list {
+      display: grid;
+      gap: 10px;
+      width: 100%;
+      margin: 24px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .queue-section-title {
+      margin: 2px 0 0;
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .queue-section-divider {
+      width: 100%;
+      height: 1px;
+      margin: 12px 0 2px;
+      border: 0;
+      background: var(--line);
+    }
+
+    .queue-item {
+      display: grid;
+      grid-template-columns: 132px minmax(0, 1fr) auto;
+      align-items: stretch;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 2px);
+      background: var(--surface);
+    }
+
+    .queue-date {
+      min-height: 66px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2px;
+      padding: 12px 14px;
+      border-right: 1px solid var(--line);
+      color: var(--text);
+      font-weight: 900;
+      line-height: 1.2;
+    }
+
+    .queue-date-label {
+      font-size: 0.96rem;
+    }
+
+    .queue-date-relative {
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+
+    .queue-date-relative.overdue,
+    .queue-date-relative.due-today {
+      color: var(--danger);
+    }
+
+    .queue-main {
+      min-width: 0;
+      min-height: 66px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      padding: 12px 14px;
+    }
+
+    .queue-title {
+      color: var(--text);
+      font-weight: 850;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .queue-path {
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .queue-meta {
+      min-width: 92px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 12px 14px;
+      border-left: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .queue-empty {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .today-area {
+      padding-top: 22px;
+      border-top: 1px solid var(--line);
+    }
+
+    .today-area:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .today-area h2 {
+      margin: 0 0 6px;
+      font-size: 1.15rem;
+      line-height: 1.2;
+    }
+
+    .today-area p {
+      margin-bottom: 14px;
+    }
+
+    .today-main {
+      min-height: 54px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .today-title {
+      font-weight: 800;
+    }
+
+    .today-path {
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .today-action {
+      color: var(--accent);
+    }
+
+    .today-action:hover,
+    .today-card.clickable:hover {
+      background: var(--accent-soft);
+    }
+
+    .today-card.clickable {
+      cursor: pointer;
+    }
+
+    .today-main.time-editable {
+      cursor: pointer;
+      transition: background-color 140ms ease;
+    }
+
+    .today-main.time-editable:hover {
+      background: var(--accent-soft);
+    }
+
+    .settings-actions {
+      width: 100%;
+      margin-top: 26px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+    }
+
+    .server-sync-status {
+      width: 100%;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .server-sync-status[data-state="connected"],
+    .server-sync-status[data-state="syncing"] {
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    .server-sync-status[data-state="error"] {
+      color: var(--danger);
+      font-weight: 800;
+    }
+
+    .danger-button,
+    .confirm-delete-button {
+      background: var(--danger);
+      color: var(--surface);
+      border-color: var(--danger);
+    }
+
+    .confirm-delete-button:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+      filter: grayscale(0.2);
+    }
+
+    .cancel-button {
+      background: var(--surface);
+      color: var(--text);
+      border-color: var(--line);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+      background: var(--modal-shade);
+    }
+
+    .modal-backdrop.visible {
+      display: flex;
+    }
+
+    .confirm-dialog {
+      width: min(430px, 100%);
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 6px);
+      background: var(--surface);
+    }
+
+    .confirm-dialog h2 {
+      margin: 0 0 8px;
+      font-size: 1.25rem;
+      line-height: 1.2;
+    }
+
+    .confirm-dialog p {
+      margin-bottom: 18px;
+    }
+
+    .modal-actions {
+      justify-content: flex-end;
+    }
+
+    .due-date-input,
+    .task-name-input,
+    .task-name-input,
+    .task-select,
+        .task-blocks-input,
+    .block-duration-input {
+      width: 100%;
+      min-height: var(--tap-size);
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .task-name-input,
+    .task-select,
+        .task-blocks-input,
+    .block-duration-input,
+    #edit-task-date {
+      margin: 4px 0 18px;
+    }
+
+    .due-mode-options,
+    .recurrence-options {
+      display: flex;
+      gap: 8px;
+      margin: 12px 0 14px;
+    }
+
+    .due-mode-option,
+    .recurrence-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: var(--tap-size);
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+    }
+
+    .due-mode-option input,
+    .recurrence-option input {
+      margin: 0;
+    }
+
+    .due-field {
+      display: none;
+      margin-bottom: 18px;
+    }
+
+    .due-field.active {
+      display: block;
+    }
+
+    .due-field label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+
+    .task-time-input,
+    .task-select {
+      width: 100%;
+      min-height: var(--tap-size);
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .task-time-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 4px 0 8px;
+    }
+
+    .task-time-help {
+      margin: 0 0 16px;
+      font-size: 0.82rem;
+    }
+
+    .task-blocks-input[readonly] {
+      background: var(--surface-muted);
+      cursor: default;
+    }
+
+    .completion-options {
+      display: grid;
+      gap: 9px;
+      margin: 16px 0;
+    }
+
+    .completion-options[hidden] {
+      display: none;
+    }
+
+    .completion-option {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      min-height: var(--tap-size);
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+    }
+
+    .completion-option:has(input:checked) {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .completion-option input {
+      margin: 4px 0 0;
+      accent-color: var(--accent);
+    }
+
+    .completion-option strong,
+    .completion-option span {
+      display: block;
+    }
+
+    .completion-option span span {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.35;
+    }
+
+    .completion-new-date-field {
+      margin: 2px 0 18px;
+    }
+
+    .completion-new-date-field[hidden] {
+      display: none;
+    }
+
+    .completion-new-date-field label {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--text);
+      font-size: 0.86rem;
+      font-weight: 800;
+    }
+
+    #completion-new-date {
+      margin: 0;
+    }
+
+    .completion-routine-confirm {
+      display: grid;
+      gap: 6px;
+      margin: 14px 0 18px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-muted);
+    }
+
+    .completion-routine-confirm[hidden] {
+      display: none;
+    }
+
+    .completion-routine-confirm strong,
+    .completion-routine-confirm span {
+      display: block;
+    }
+
+    .completion-routine-confirm span {
+      color: var(--text);
+      font-weight: 850;
+    }
+
+    .completion-routine-confirm p {
+      font-size: 0.84rem;
+    }
+
+    @supports (-webkit-touch-callout: none) {
+      input,
+      textarea,
+      select {
+        font-size: 16px !important;
+      }
+    }
+
+    .execution-next-panel {
+      margin-top: 14px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 2px);
+      background: var(--surface);
+    }
+
+    .execution-next-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .execution-next-date {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .execution-next-card {
+      display: grid;
+      gap: 12px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-muted);
+    }
+
+    .execution-next-title {
+      margin: 0;
+      font-size: 1.25rem;
+      line-height: 1.2;
+    }
+
+    .execution-next-path,
+    .execution-next-meta,
+    .execution-next-empty {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .execution-next-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .execution-next-actions button {
+      min-height: var(--tap-size);
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .execution-next-actions .primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--surface);
+    }
+
+    .consistency-ratio {
+      color: var(--text);
+      font-size: 0.64rem;
+      font-weight: 850;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .settings-block-field {
+      width: 100%;
+      margin-top: 22px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .settings-block-field label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 800;
+    }
+
+    .settings-block-field p {
+      margin-bottom: 12px;
+      font-size: 0.86rem;
+    }
+
+    .settings-block-field .block-duration-input {
+      margin-bottom: 10px;
+    }
+
+    .calendar-day-load {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .mobile-tab-menu {
+      position: absolute;
+      right: max(12px, env(safe-area-inset-right));
+      bottom: calc(100% + 8px);
+      width: min(260px, calc(100vw - 24px));
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+    }
+
+    .mobile-tab-menu.open {
+      display: grid;
+      gap: 4px;
+    }
+
+    .mobile-tab-menu-item {
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--text);
+      text-align: left;
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    .mobile-tab-menu-item.active,
+    .mobile-tab-menu-item:hover {
+      background: var(--accent-soft);
+    }
+
+    @media (max-width: 560px) {
+      body {
+        min-height: 100dvh;
+      }
+
+      .app {
+        min-height: 100dvh;
+      }
+
+      .top-tabs {
+        position: fixed;
+        top: auto;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 44px;
+        align-items: center;
+        gap: 10px;
+        padding: 10px max(12px, env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+        border-top: 1px solid var(--line);
+        border-bottom: 0;
+      }
+
+      .tab-button {
+        display: none;
+      }
+
+      .mobile-tab-menu-button {
+        min-width: 44px;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--surface);
+        color: var(--text);
+        font-size: 1.15rem;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      .mobile-tab-current {
+        min-width: 0;
+        min-height: 46px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: var(--accent);
+        color: var(--surface);
+        font-size: 0.95rem;
+        font-weight: 800;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      main {
+        width: 100%;
+        padding: 24px 16px calc(88px + env(safe-area-inset-bottom));
+      }
+
+      h1 {
+        margin-bottom: 6px;
+      }
+
+      .task-composer {
+        grid-template-columns: 1fr;
+        margin-top: 22px;
+      }
+
+      .add-button {
+        width: 100%;
+      }
+
+      .planning-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .toolbar-actions {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .delete-current-button.visible {
+        width: 100%;
+        min-width: 0;
+        padding-inline: 8px;
+        font-size: 0.9rem;
+      }
+
+      .task-card,
+      .today-card {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+
+      .task-title {
+        width: 100%;
+        min-height: 62px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
+        padding: 0 14px;
+        border: 0;
+        background: transparent;
+        color: var(--text);
+        font: inherit;
+        font-weight: 700;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .delete-button,
+      .edit-button {
+        grid-column: 2;
+        grid-row: 1;
+        min-height: 56px;
+      }
+
+      .task-days {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        min-height: 40px;
+        justify-content: center;
+        text-align: center;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .task-title.has-status {
+        align-items: center;
+        flex-direction: row;
+      }
+
+      .task-title::after,
+      .task-estimate {
+        align-self: center;
+      }
+
+      .today-action {
+        grid-column: 2;
+        grid-row: 1;
+        min-height: 56px;
+      }
+
+      .today-main {
+        min-height: 56px;
+      }
+
+      .due-mode-options,
+      .recurrence-options {
+        flex-direction: column;
+      }
+
+      .calendar-dialog {
+        width: 100%;
+      }
+
+      .calendar-tab {
+        width: calc(100vw - 32px);
+      }
+
+      .calendar-toolbar {
+        grid-template-columns: 44px minmax(0, 1fr) 44px;
+      }
+
+      .calendar-nav-button {
+        width: 44px;
+        padding-inline: 0;
+      }
+
+      .calendar-list {
+        width: 100%;
+        grid-template-columns: repeat(7, 100%);
+        gap: 10px;
+        overflow-x: auto;
+        overflow-y: visible;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .calendar-day {
+        width: 100%;
+        min-width: 0;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+      }
+
+      .queue-item,
+      .queue-item.queue-item-with-completion {
+        grid-template-columns: 104px minmax(0, 1fr) 54px;
+      }
+
+      .queue-completion {
+        grid-column: 3;
+        grid-row: 1;
+        min-width: 54px;
+        min-height: 66px;
+      }
+
+      .queue-date {
+        align-items: center;
+        text-align: center;
+        border-right: 1px solid var(--line);
+      }
+
+      .queue-meta {
+        grid-column: 1 / -1;
+        min-width: 0;
+        justify-content: flex-start;
+        padding: 8px 12px;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+        text-align: left;
+      }
+
+      .settings-actions,
+      .modal-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .modal-backdrop {
+        align-items: flex-end;
+        padding: 12px max(12px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+      }
+
+      .confirm-dialog {
+        width: 100%;
+        max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        overflow: auto;
+      }
+    }
+
+
+    /* =========================================================
+       FLUXO DE EXECUÇÃO DIÁRIA
+       ========================================================= */
+    .execution-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: start;
+      margin-bottom: 22px;
+    }
+
+    .execution-hero-copy h1 {
+      margin-top: 4px;
+      margin-bottom: 8px;
+    }
+
+    .execution-eyebrow {
+      display: inline-block;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .execution-score {
+      min-width: 112px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      text-align: right;
+    }
+
+    .execution-score strong {
+      display: block;
+      font-size: 1.8rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .execution-score span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.25;
+    }
+
+
+    .consistency-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .consistency-strip h2 {
+      margin: 2px 0 0;
+      font-size: 1.08rem;
+    }
+
+    .today-route-details,
+    .consistency-strip {
+      margin-top: 14px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 2px);
+      background: var(--surface);
+    }
+
+    .suggestion-count {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .today-route-details summary {
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .today-route-details > p {
+      margin-top: 6px;
+      font-size: 0.86rem;
+    }
+
+    .today-route-details .today-list {
+      margin-top: 14px;
+    }
+
+    .consistency-strip {
+      align-items: flex-end;
+    }
+
+    .consistency-days {
+      display: flex;
+      gap: 7px;
+      align-items: flex-end;
+    }
+
+    .consistency-day {
+      display: grid;
+      gap: 5px;
+      justify-items: center;
+      color: var(--muted);
+      font-size: 0.65rem;
+      font-weight: 700;
+    }
+
+    .consistency-dot {
+      min-width: 46px;
+      height: 34px;
+      display: inline-grid;
+      place-items: center;
+      padding: 0 7px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface-muted);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+
+    .consistency-dot.did-work {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--surface);
+    }
+
+    .consistency-dot.is-today {
+      outline: 2px solid var(--line);
+      outline-offset: 2px;
+    }
+
+
+    @media (max-width: 620px) {
+      .execution-hero {
+        grid-template-columns: 1fr;
+      }
+
+      .execution-score {
+        width: 100%;
+        text-align: left;
+      }
+
+      .consistency-strip {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .consistency-days {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 4px;
+      }
+
+      .consistency-dot {
+        width: 100%;
+        min-width: 0;
+        height: 30px;
+        padding-inline: 3px;
+        font-size: 0.62rem;
+      }
+    }
+
+
+    /* ===== PLANEJAMENTO SEMANAL POR HORÁRIO ===== */
+
+    .planned-task-draggable.is-dragging {
+      opacity: 0.42;
+    }
+
+    .calendar-day {
+      display: grid;
+      align-content: start;
+      gap: 8px;
+      transition: border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+    }
+
+    .calendar-day.is-drop-target {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      box-shadow: inset 0 0 0 1px var(--accent);
+    }
+
+    .calendar-date {
+      margin-bottom: 4px;
+    }
+
+    .calendar-day-queue {
+      display: grid;
+      gap: 7px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .calendar-task {
+      display: grid;
+      gap: 6px;
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface);
+      cursor: grab;
+      user-select: none;
+    }
+
+    .calendar-task:active {
+      cursor: grabbing;
+    }
+
+    .calendar-task-head {
+      display: block;
+    }
+
+    .calendar-task-text {
+      min-width: 0;
+      padding: 2px 0;
+    }
+
+    .calendar-gap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      padding: 6px 8px;
+      border: 1px dashed var(--line);
+      border-radius: 10px;
+      color: var(--muted);
+      background: var(--surface-muted);
+      font-size: 0.72rem;
+      font-weight: 750;
+      text-align: center;
+    }
+
+    .calendar-empty {
+      padding: 8px 2px;
+      text-align: left;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .calendar-list {
+      grid-template-columns: repeat(7, minmax(220px, 1fr));
+      max-height: none;
+      align-items: start;
+    }
+
+    /* ===== SEMANA EM LARGURA TOTAL NO DESKTOP ===== */
+    @media (min-width: 901px) {
+      #calendario.calendar-tab {
+        width: calc(100vw - 32px);
+        max-width: none;
+        margin-left: 50%;
+        transform: translateX(-50%);
+      }
+
+      #calendario .calendar-list {
+        width: 100%;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 8px;
+        overflow-x: visible;
+      }
+
+      #calendario .calendar-day {
+        min-width: 0;
+        padding: 10px;
+      }
+
+      #calendario .calendar-task-head {
+        min-width: 0;
+      }
+
+      #calendario .calendar-task-text,
+      #calendario .calendar-task-title,
+      #calendario .calendar-task-meta {
+        min-width: 0;
+        overflow-wrap: anywhere;
+        white-space: normal;
+      }
+    }
+
+  
+
+    /* ===== MOBILE: CADA COLUNA DE DIA OCUPA TODA A LARGURA ÚTIL ===== */
+    @media (max-width: 900px) {
+      #calendario.calendar-tab {
+        width: calc(100vw - 32px);
+        max-width: none;
+      }
+
+      #calendario .calendar-list {
+        width: 100%;
+        grid-template-columns: repeat(7, 100%);
+        gap: 10px;
+        overflow-x: auto;
+        overflow-y: visible;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      #calendario .calendar-day {
+        width: 100%;
+        min-width: 0;
+        max-width: none;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+      }
+    }
+
+    /* ===== INTERAÇÕES DA FILA E DA SEMANA ===== */
+    .calendar-mode-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 14px;
+    }
+
+    .calendar-mode-button {
+      min-height: var(--tap-size);
+      padding: 10px 16px;
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: var(--surface);
+      font-weight: 850;
+      cursor: pointer;
+    }
+
+    .calendar-mode-button:hover {
+      opacity: 0.88;
+    }
+
+    .calendar-task[data-calendar-mode="edit"],
+    .calendar-task[data-calendar-mode="complete"] {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .calendar-task[data-calendar-mode="edit"]:hover,
+    .calendar-task[data-calendar-mode="complete"]:hover,
+    .queue-item.queue-item-clickable:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .calendar-task[data-calendar-mode="move"] {
+      cursor: grab;
+    }
+
+    .calendar-task[data-calendar-mode="move"]:active {
+      cursor: grabbing;
+    }
+
+    .calendar-task:focus-visible,
+    .queue-item.queue-item-clickable:focus-visible,
+    .calendar-mode-button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .queue-item.queue-item-clickable {
+      cursor: pointer;
+      transition: border-color 140ms ease, background-color 140ms ease;
+    }
+
+    .queue-item.queue-item-with-completion {
+      grid-template-columns: 132px minmax(0, 1fr) auto 58px;
+    }
+
+    .queue-completion {
+      min-width: 58px;
+      min-height: 66px;
+      border-left: 1px solid var(--line);
+      background: transparent;
+    }
+
+    .queue-completion:hover {
+      background: var(--accent-soft);
+    }
+
+    .queue-completion .due-checkbox {
+      width: 22px;
+      height: 22px;
+    }
+
+    @media (max-width: 620px) {
+      .calendar-mode-row,
+      .calendar-mode-button {
+        width: 100%;
+      }
+
+      .queue-item.queue-item-with-completion {
+        grid-template-columns: 104px minmax(0, 1fr) 54px;
+      }
+
+      .queue-completion {
+        grid-column: 3;
+        grid-row: 1;
+        min-width: 54px;
+        min-height: 66px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="app">
+    <nav class="top-tabs" aria-label="Abas principais">
+      <div class="mobile-tab-current" id="mobile-tab-current" aria-live="polite">Execução</div>
+      <button class="mobile-tab-menu-button" id="mobile-tab-menu-button" type="button" aria-label="Abrir menu de abas" aria-expanded="false">☰</button>
+      <div class="mobile-tab-menu" id="mobile-tab-menu" role="menu" aria-label="Escolher aba">
+        <button class="mobile-tab-menu-item active" type="button" data-mobile-tab="hoje" role="menuitem">Execução</button>
+        <button class="mobile-tab-menu-item" type="button" data-mobile-tab="planejamento" role="menuitem">Planejamento</button>
+        <button class="mobile-tab-menu-item" type="button" data-mobile-tab="calendario" role="menuitem">Semana</button>
+        <button class="mobile-tab-menu-item" type="button" data-mobile-tab="fila" role="menuitem">Fila</button>
+        <button class="mobile-tab-menu-item" type="button" data-mobile-tab="configuracoes" role="menuitem">Configurações</button>
+      </div>
+      <button class="tab-button active" type="button" data-tab="hoje" aria-selected="true">
+        Execução
+      </button>
+      <button class="tab-button" type="button" data-tab="planejamento" aria-selected="false">
+        Planejamento
+      </button>
+      <button class="tab-button" type="button" data-tab="calendario" aria-selected="false">
+        Semana
+      </button>
+      <button class="tab-button" type="button" data-tab="fila" aria-selected="false">
+        Fila
+      </button>
+      <button class="tab-button" type="button" data-tab="configuracoes" aria-selected="false">
+        Configurações
+      </button>
+    </nav>
+
+    <main>
+      <section class="tab-panel" id="planejamento" aria-labelledby="tab-planejamento">
+        <p>Organize as próximas tarefas e escolha o que merece atenção.</p>
+        <form class="task-composer" id="task-form">
+          <input class="task-input" id="task-input" type="text" placeholder="Digite uma tarefa" autocomplete="off">
+          <button class="add-button" type="submit">Adicionar</button>
+        </form>
+        <div class="planning-toolbar">
+          <div class="breadcrumb" id="breadcrumb" aria-label="Caminho atual"></div>
+          <div class="toolbar-actions">
+            <button class="delete-current-button" id="delete-current-button" type="button">Apagar</button>
+          </div>
+        </div>
+        <ul class="task-list" id="task-list" aria-label="Tarefas do planejamento">
+          <li class="empty-state" id="empty-state">Nenhum bloco criado ainda.</li>
+        </ul>
+      </section>
+
+      <section class="tab-panel active" id="hoje" aria-labelledby="tab-hoje">
+        <div class="execution-hero">
+          <div class="execution-hero-copy">
+            <span class="execution-eyebrow" id="today-date-label">Hoje</span>
+            <h1>Execução</h1>
+            <p>Avance uma tarefa por vez. Ao concluir as tarefas de hoje, a próxima tarefa agendada será exibida automaticamente.</p>
+          </div>
+          <div class="execution-score" aria-label="Resumo de execução do dia">
+            <strong id="today-completed-count">0</strong>
+            <span>concluída(s) hoje</span>
+          </div>
+        </div>
+
+        <section class="execution-next-panel" aria-labelledby="execution-next-title">
+          <div class="execution-next-header">
+            <div>
+              <span class="execution-eyebrow">PRÓXIMA TAREFA</span>
+              <h2 id="execution-next-title">Foco atual</h2>
+            </div>
+            <span class="execution-next-date" id="execution-next-date"></span>
+          </div>
+          <div id="execution-next-task" aria-live="polite"></div>
+        </section>
+
+        <section class="consistency-strip" aria-labelledby="consistency-title">
+          <div>
+            <span class="execution-eyebrow">CONSTÂNCIA</span>
+            <h2 id="consistency-title">Últimos 7 dias</h2>
+          </div>
+          <div class="consistency-days" id="consistency-days" aria-label="Histórico de execução dos últimos sete dias"></div>
+        </section>
+
+      </section>
+
+      <section class="tab-panel calendar-tab" id="calendario" aria-labelledby="tab-calendario">
+        <p>Escolha o modo de interação: editar abre a tarefa, concluir abre a confirmação e mover permite arrastar entre os dias. Os horários permanecem os mesmos ao mover.</p>
+        <div class="calendar-mode-row">
+          <button class="calendar-mode-button" id="calendar-mode-button" type="button" data-mode="edit">Modo: Editar</button>
+        </div>
+        <div class="calendar-toolbar" aria-label="Navegação semanal do calendário">
+          <button class="calendar-nav-button" id="calendar-previous-week" type="button" aria-label="Semana anterior">←</button>
+          <span class="calendar-week-label" id="calendar-week-label"></span>
+          <button class="calendar-nav-button" id="calendar-next-week" type="button" aria-label="Próxima semana">→</button>
+        </div>
+        <div class="calendar-list" id="calendar-list" aria-label="Planejamento semanal por horário"></div>
+      </section>
+
+      <section class="tab-panel" id="fila" aria-labelledby="tab-fila">
+        <p>Todas as tarefas com data, ordenadas da mais antiga para a mais recente. Clique em uma tarefa para editar.</p>
+        <ul class="queue-list" id="queue-list" aria-label="Fila de tarefas por data">
+          <li class="queue-empty">Nenhuma tarefa com data definida.</li>
+        </ul>
+      </section>
+
+      <section class="tab-panel" id="configuracoes" aria-labelledby="tab-configuracoes">
+        <p>Ajuste preferências do app para deixar o fluxo do seu jeito.</p>
+        <div class="settings-block-field">
+          <label for="block-duration-minutes">Tempo de cada bloco</label>
+          <p id="block-duration-summary">Defina quantos minutos representa um bloco de execução.</p>
+          <input class="block-duration-input" id="block-duration-minutes" type="number" min="1" max="1440" step="1" inputmode="numeric" value="30">
+          <button class="save-useful-time-button" id="save-block-duration" type="button">Salvar duração do bloco</button>
+        </div>
+        <div class="settings-actions">
+          <button class="export-button" id="report-button" type="button">Relatório</button>
+          <button class="export-button" id="theme-toggle-button" type="button">Tema escuro</button>
+          <span class="server-sync-status" id="server-sync-status" role="status" data-state="syncing">Carregando dados...</span>
+          <button class="export-button" id="logout-button" type="button">Sair</button>
+          <button class="export-button" id="export-data-button" type="button">Exportar dados CSV</button>
+          <button class="export-button" id="import-data-button" type="button">Importar dados CSV</button>
+          <input id="import-data-input" type="file" accept=".csv,text/csv" hidden>
+          <button class="danger-button" id="clear-data-button" type="button">Apagar dados</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="completion-modal" role="dialog" aria-modal="true" aria-labelledby="completion-title">
+    <div class="confirm-dialog">
+      <h2 id="completion-title">Concluir tarefa?</h2>
+      <p id="completion-message">Confirme a conclusão e escolha o que fazer com a tarefa.</p>
+
+      <div class="completion-options" id="completion-options" role="radiogroup" aria-label="Ação para a tarefa">
+        <label class="completion-option">
+          <input type="radio" name="completion-action" value="delete">
+          <span>
+            <strong>Apagar a tarefa</strong>
+            <span>Remove a tarefa e todas as subtarefas dentro dela.</span>
+          </span>
+        </label>
+
+        <label class="completion-option">
+          <input type="radio" name="completion-action" value="reschedule">
+          <span>
+            <strong>Escolher uma nova data</strong>
+            <span>Mantém a tarefa e agenda sua próxima execução para outra data.</span>
+          </span>
+        </label>
+
+        <label class="completion-option">
+          <input type="radio" name="completion-action" value="postpone">
+          <span>
+            <strong>Adiar para amanhã</strong>
+            <span>Move a tarefa para amanhã mantendo o horário atual.</span>
+          </span>
+        </label>
+
+        <label class="completion-option">
+          <input type="radio" name="completion-action" value="undated">
+          <span>
+            <strong>Manter a tarefa sem data</strong>
+            <span>Mantém a tarefa no planejamento, mas remove sua data atual.</span>
+          </span>
+        </label>
+      </div>
+
+      <div class="completion-new-date-field" id="completion-new-date-field" hidden>
+        <label for="completion-new-date">Nova data</label>
+        <input class="due-date-input" id="completion-new-date" type="date">
+      </div>
+
+      <div class="completion-routine-confirm" id="completion-routine-confirm" hidden>
+        <strong>Próxima execução da rotina</strong>
+        <span id="completion-routine-date"></span>
+        <p>A tarefa continuará recorrendo automaticamente neste mesmo dia da semana, conforme a recorrência escolhida.</p>
+      </div>
+
+      <div class="modal-actions">
+        <button class="cancel-button" id="cancel-completion" type="button">Cancelar</button>
+        <button class="save-name-button" id="confirm-completion" type="button" disabled>Confirmar conclusão</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="delete-modal" role="dialog" aria-modal="true" aria-labelledby="delete-title">
+    <div class="confirm-dialog">
+      <h2 id="delete-title">Apagar tarefa?</h2>
+      <p id="delete-message">Essa ação remove a tarefa e todas as subtarefas dentro dela.</p>
+      <div class="modal-actions">
+        <button class="cancel-button" id="cancel-delete" type="button">Cancelar</button>
+        <button class="confirm-delete-button" id="confirm-delete" type="button">Apagar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="edit-task-modal" role="dialog" aria-modal="true" aria-labelledby="edit-task-title">
+    <div class="confirm-dialog">
+      <h2 id="edit-task-title">Editar tarefa</h2>
+      <p>Altere as principais informações da tarefa em um único lugar.</p>
+
+      <label class="task-field-label" for="edit-task-name">Nome</label>
+      <input class="task-name-input" id="edit-task-name" type="text" placeholder="Nome da tarefa" autocomplete="off">
+
+      <label class="task-field-label" for="edit-task-recurrence">Recorrência</label>
+      <select class="task-select" id="edit-task-recurrence" aria-label="Recorrência da tarefa">
+        <option value="none">Sem recorrência</option>
+        <option value="daily">Diária</option>
+        <option value="weekly">Semanal</option>
+        <option value="biweekly">Quinzenal</option>
+        <option value="monthly">Mensal</option>
+      </select>
+
+      <label class="task-field-label" for="edit-task-date">Data</label>
+      <input class="due-date-input" id="edit-task-date" type="date">
+
+      <div class="task-time-grid" id="edit-task-time-fields">
+        <div>
+          <label class="task-field-label" for="edit-task-start-time">Hora início</label>
+          <input class="task-time-input" id="edit-task-start-time" type="time" step="60">
+        </div>
+        <div>
+          <label class="task-field-label" for="edit-task-end-time">Hora fim</label>
+          <input class="task-time-input" id="edit-task-end-time" type="time" step="60">
+        </div>
+      </div>
+      <p class="task-time-help" id="edit-task-time-summary">Ao salvar, início e fim são ajustados para a grade de minutos definida pelo tamanho do bloco.</p>
+
+      <label class="task-field-label" for="edit-task-blocks">Blocos necessários</label>
+      <input class="task-blocks-input" id="edit-task-blocks" type="number" min="1" max="999" step="1" inputmode="numeric" value="1" readonly aria-readonly="true">
+
+      <div class="modal-actions">
+        <button class="cancel-button" id="cancel-edit-task" type="button">Cancelar</button>
+        <button class="save-name-button" id="save-edit-task" type="button">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="report-modal" role="dialog" aria-modal="true" aria-labelledby="report-title">
+    <div class="confirm-dialog report-dialog">
+      <h2 id="report-title">Relatório</h2>
+      <p>Acompanhe a conclusão diária com base na quantidade de tarefas planejadas e concluídas.</p>
+      <div class="report-table-wrap">
+        <table class="report-table" aria-label="Relatório diário">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Tarefas</th>
+              <th>Conclusão</th>
+            </tr>
+          </thead>
+          <tbody id="report-table-body">
+            <tr>
+              <td class="report-empty" colspan="3">Nenhum dia com tarefas planejadas ainda.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-actions">
+        <button class="cancel-button" id="close-report" type="button">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="clear-data-modal" role="dialog" aria-modal="true" aria-labelledby="clear-data-title">
+    <div class="confirm-dialog">
+      <h2 id="clear-data-title">Apagar todos os dados?</h2>
+      <p>Essa ação remove todos os blocos, sub-blocos, vencimentos e planejamentos salvos neste navegador.</p>
+      <div class="modal-actions">
+        <button class="cancel-button" id="cancel-clear-data" type="button">Cancelar</button>
+        <button class="confirm-delete-button" id="confirm-clear-data" type="button">Apagar tudo</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+    const mobileTabCurrent = document.querySelector('#mobile-tab-current');
+    const mobileTabMenuButton = document.querySelector('#mobile-tab-menu-button');
+    const mobileTabMenu = document.querySelector('#mobile-tab-menu');
+    const mobileTabMenuItems = Array.from(document.querySelectorAll('[data-mobile-tab]'));
+    const taskForm = document.querySelector('#task-form');
+    const taskInput = document.querySelector('#task-input');
+    const taskList = document.querySelector('#task-list');
+    const emptyState = document.querySelector('#empty-state');
+    const breadcrumb = document.querySelector('#breadcrumb');
+    const deleteCurrentButton = document.querySelector('#delete-current-button');
+    const executionNextTask = document.querySelector('#execution-next-task');
+    const executionNextDate = document.querySelector('#execution-next-date');
+    const calendarList = document.querySelector('#calendar-list');
+    const calendarPreviousWeekButton = document.querySelector('#calendar-previous-week');
+    const calendarNextWeekButton = document.querySelector('#calendar-next-week');
+    const calendarWeekLabel = document.querySelector('#calendar-week-label');
+    const calendarModeButton = document.querySelector('#calendar-mode-button');
+    const queueList = document.querySelector('#queue-list');
+    const todayDateLabel = document.querySelector('#today-date-label');
+    const todayCompletedCount = document.querySelector('#today-completed-count');
+    const consistencyDays = document.querySelector('#consistency-days');
+    const exportDataButton = document.querySelector('#export-data-button');
+    const importDataButton = document.querySelector('#import-data-button');
+    const importDataInput = document.querySelector('#import-data-input');
+    const reportButton = document.querySelector('#report-button');
+    const reportModal = document.querySelector('#report-modal');
+    const reportTableBody = document.querySelector('#report-table-body');
+    const closeReportButton = document.querySelector('#close-report');
+    const themeToggleButton = document.querySelector('#theme-toggle-button');
+    const logoutButton = document.querySelector('#logout-button');
+    const serverSyncStatus = document.querySelector('#server-sync-status');
+    const clearDataButton = document.querySelector('#clear-data-button');
+    const clearDataModal = document.querySelector('#clear-data-modal');
+    const cancelClearDataButton = document.querySelector('#cancel-clear-data');
+    const confirmClearDataButton = document.querySelector('#confirm-clear-data');
+    const deleteModal = document.querySelector('#delete-modal');
+    const deleteMessage = document.querySelector('#delete-message');
+    const cancelDeleteButton = document.querySelector('#cancel-delete');
+    const confirmDeleteButton = document.querySelector('#confirm-delete');
+    const completionModal = document.querySelector('#completion-modal');
+    const completionMessage = document.querySelector('#completion-message');
+    const completionOptions = document.querySelector('#completion-options');
+    const completionActionInputs = Array.from(document.querySelectorAll('input[name="completion-action"]'));
+    const completionNewDateField = document.querySelector('#completion-new-date-field');
+    const completionNewDateInput = document.querySelector('#completion-new-date');
+    const completionRoutineConfirm = document.querySelector('#completion-routine-confirm');
+    const completionRoutineDate = document.querySelector('#completion-routine-date');
+    const cancelCompletionButton = document.querySelector('#cancel-completion');
+    const confirmCompletionButton = document.querySelector('#confirm-completion');
+    const editTaskModal = document.querySelector('#edit-task-modal');
+    const editTaskNameInput = document.querySelector('#edit-task-name');
+    const editTaskRecurrenceLabel = document.querySelector('label[for="edit-task-recurrence"]');
+    const editTaskRecurrenceSelect = document.querySelector('#edit-task-recurrence');
+    const editTaskDateLabel = document.querySelector('label[for="edit-task-date"]');
+    const editTaskDateInput = document.querySelector('#edit-task-date');
+    const editTaskTimeFields = document.querySelector('#edit-task-time-fields');
+    const editTaskStartTimeInput = document.querySelector('#edit-task-start-time');
+    const editTaskEndTimeInput = document.querySelector('#edit-task-end-time');
+    const editTaskTimeSummary = document.querySelector('#edit-task-time-summary');
+    const editTaskBlocksInput = document.querySelector('#edit-task-blocks');
+    const blockDurationMinutesInput = document.querySelector('#block-duration-minutes');
+    const blockDurationSummary = document.querySelector('#block-duration-summary');
+    const saveBlockDurationButton = document.querySelector('#save-block-duration');
+    const cancelEditTaskButton = document.querySelector('#cancel-edit-task');
+    const saveEditTaskButton = document.querySelector('#save-edit-task');
+    const storageKey = 'todo-single-file-state';
+    const rootLevel = {
+      id: 'root',
+      title: 'Planejamento',
+      children: [],
+      dueDate: null,
+      parent: null,
+      recurrence: null,
+      blocksRequired: 1
+    };
+    let nextTaskId = 1;
+    let currentLevel = rootLevel;
+    let pendingDeleteTask = null;
+    let pendingCompletionTask = null;
+    let pendingRoutineNextDate = null;
+    let todayPlan = [];
+    let dailyReports = [];
+    let appTheme = getSavedTheme();
+    let blockDurationMinutes = 30;
+    let lastKnownDate = formatDateValue(getTodayStart());
+    let isApplyingRemoteState = false;
+    let serverSaveTimer = null;
+    let serverSaveInFlight = false;
+    let serverSavePending = false;
+    let calendarWeekStart = null;
+    let calendarInteractionMode = 'edit';
+    let editTargetTask = null;
+    let executionState = {
+      dailyHistory: {}
+    };
+
+    function normalizeTheme(value) {
+      return value === 'dark' ? 'dark' : 'light';
+    }
+
+    function getSavedTheme() {
+      try {
+        return normalizeTheme(localStorage.getItem(`${storageKey}-theme`));
+      } catch (error) {
+        return 'light';
+      }
+    }
+
+    function updateThemeToggleButton() {
+      themeToggleButton.textContent = appTheme === 'dark' ? 'Tema claro' : 'Tema escuro';
+      themeToggleButton.setAttribute('aria-pressed', String(appTheme === 'dark'));
+    }
+
+    function applyTheme(theme) {
+      appTheme = normalizeTheme(theme);
+      document.documentElement.dataset.theme = appTheme;
+      try {
+        localStorage.setItem(`${storageKey}-theme`, appTheme);
+      } catch (error) {
+        // O tema continua aplicado mesmo se o armazenamento local estiver indisponível.
+      }
+      updateThemeToggleButton();
+    }
+
+    function normalizeTaskTitle(value) {
+      // Sem capitalização automática: preserva exatamente a caixa digitada,
+      // removendo apenas espaços externos acidentais.
+      return String(value ?? '').trim();
+    }
+
+    function normalizeTaskTitleKey(value) {
+      return String(value ?? '').trim().toLocaleLowerCase('pt-BR');
+    }
+
+    function normalizeBlocksRequired(value) {
+      const parsed = Math.floor(Number(value));
+      return Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 999) : 1;
+    }
+
+    function normalizeBlockDurationMinutes(value) {
+      const parsed = Math.floor(Number(value));
+      return Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 1440) : 30;
+    }
+
+    function normalizeTime(value) {
+      if (typeof value !== 'string') return null;
+      const match = value.match(/^([01]\d|2[0-3]):([0-5]\d)$/);
+      return match ? `${match[1]}:${match[2]}` : null;
+    }
+
+    function timeToMinutes(value) {
+      const normalized = normalizeTime(value);
+      if (!normalized) return null;
+      const [hours, minutes] = normalized.split(':').map(Number);
+      return (hours * 60) + minutes;
+    }
+
+    function minutesToTime(value) {
+      const minutes = Math.max(0, Math.min(1439, Math.round(Number(value) || 0)));
+      return `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+    }
+
+    function formatDurationMinutes(value) {
+      const minutes = Math.max(0, Math.floor(Number(value) || 0));
+      if (minutes <= 60) return `${minutes} min`;
+      const hours = Math.floor(minutes / 60);
+      const rest = minutes % 60;
+      return rest ? `${hours}h ${rest}min` : `${hours}h`;
+    }
+
+    function adjustTimeRangeToBlocks(startTime, endTime) {
+      const start = timeToMinutes(startTime);
+      const end = timeToMinutes(endTime);
+      if (start === null || end === null || end <= start) return null;
+
+      const block = normalizeBlockDurationMinutes(blockDurationMinutes);
+
+      // Os horários sempre precisam cair exatamente na grade definida pelo bloco.
+      // O início volta para o múltiplo anterior e o fim avança para o próximo,
+      // garantindo que nenhum minuto informado pelo usuário seja descartado.
+      // Ex.: bloco 15 min -> 10:07–10:22 vira 10:00–10:30.
+      const adjustedStart = Math.floor(start / block) * block;
+      const adjustedEnd = Math.ceil(end / block) * block;
+
+      // 24:00 não é um valor válido para <input type="time"> nem para o modelo
+      // atual do aplicativo. Se o arredondamento ultrapassar o dia, o período
+      // não pode ser encaixado em blocos completos nesse mesmo dia.
+      if (adjustedStart < 0 || adjustedEnd > 1439 || adjustedEnd <= adjustedStart) return null;
+
+      const duration = adjustedEnd - adjustedStart;
+      const blocksRequired = Math.max(1, Math.round(duration / block));
+      return {
+        startTime: minutesToTime(adjustedStart),
+        endTime: minutesToTime(adjustedEnd),
+        durationMinutes: duration,
+        blocksRequired,
+        adjusted: adjustedStart !== start || adjustedEnd !== end
+      };
+    }
+
+    function getTaskDurationMinutes(task) {
+      const start = timeToMinutes(task?.startTime);
+      const end = timeToMinutes(task?.endTime);
+      if (start !== null && end !== null && end > start) {
+        return end - start;
+      }
+      return normalizeBlocksRequired(task?.blocksRequired) * normalizeBlockDurationMinutes(blockDurationMinutes);
+    }
+
+    function getTaskBlocksLabel(task) {
+      const blocks = normalizeBlocksRequired(task?.blocksRequired);
+      return `${blocks} bloco${blocks === 1 ? '' : 's'}`;
+    }
+
+    function recalculateTaskBlocksFromTimes() {
+      const block = normalizeBlockDurationMinutes(blockDurationMinutes);
+      getAllTasks().forEach((task) => {
+        const start = timeToMinutes(task?.startTime);
+        const end = timeToMinutes(task?.endTime);
+        if (start !== null && end !== null && end > start) {
+          task.blocksRequired = Math.max(1, Math.ceil((end - start) / block));
+        }
+      });
+    }
+
+    function taskHasSubtasks(task) {
+      return Boolean(task?.parent && Array.isArray(task.children) && task.children.length > 0);
+    }
+
+    function clearSchedulingFromParentTask(task) {
+      if (!task || !taskHasSubtasks(task)) return false;
+
+      let changed = false;
+      for (const key of ['recurrence', 'dueDate', 'plannedDate', 'startTime', 'endTime']) {
+        if (task[key] !== null) changed = true;
+        task[key] = null;
+      }
+      task.blocksRequired = 1;
+      return changed;
+    }
+
+    function enforceParentTaskSchedulingRules() {
+      let changed = false;
+      getAllTasks().forEach((task) => {
+        if (clearSchedulingFromParentTask(task)) changed = true;
+      });
+      if (changed) syncTodayPlanFromTaskPlans();
+      return changed;
+    }
+
+    function getTaskDisplayTitle(task) {
+      const originalTitle = normalizeTaskTitle(task?.title || '');
+
+      // Exceção estrutural já definida: os sete dias da ROTINA permanecem
+      // sempre em maiúsculas, independentemente de como forem armazenados.
+      if (isRoutineDayStructureTask(task)) {
+        const definition = routineDayDefinitions.find((day) => day.id === task.id);
+        return (definition?.label || originalTitle).toLocaleUpperCase('pt-BR');
+      }
+
+      return originalTitle;
+    }
+
+    function applyTaskNamePresentation(element, task) {
+      element.textContent = getTaskDisplayTitle(task);
+      element.classList.toggle('task-name-has-subtasks', taskHasSubtasks(task));
+    }
+
+    function createTaskData(title, parent, dueDate = null, children = [], id = null, checked = false, recurrence = null, plannedDate = null, blocksRequired = 1, startTime = null, endTime = null) {
+      const taskId = id || `task-${nextTaskId++}`;
+      const numericId = Number(String(taskId).replace('task-', ''));
+
+      if (Number.isFinite(numericId)) {
+        nextTaskId = Math.max(nextTaskId, numericId + 1);
+      }
+
+      const normalizedStart = normalizeTime(startTime);
+      const normalizedEnd = normalizeTime(endTime);
+
+      return {
+        id: taskId,
+        title: normalizeTaskTitle(title),
+        children,
+        parent,
+        dueDate: normalizePlannedDate(dueDate),
+        checked,
+        recurrence: normalizeRecurrence(recurrence),
+        plannedDate: normalizePlannedDate(plannedDate),
+        blocksRequired: normalizeBlocksRequired(blocksRequired),
+        startTime: normalizedStart,
+        endTime: normalizedEnd
+      };
+    }
+
+    function normalizeRecurrence(value) {
+      return ['daily', 'weekly', 'biweekly', 'monthly'].includes(value) ? value : null;
+    }
+
+
+    const routineRootId = 'routine-root';
+    const routineDayDefinitions = [
+      { id: 'routine-day-1', weekday: 1, label: 'SEGUNDA' },
+      { id: 'routine-day-2', weekday: 2, label: 'TERÇA' },
+      { id: 'routine-day-3', weekday: 3, label: 'QUARTA' },
+      { id: 'routine-day-4', weekday: 4, label: 'QUINTA' },
+      { id: 'routine-day-5', weekday: 5, label: 'SEXTA' },
+      { id: 'routine-day-6', weekday: 6, label: 'SÁBADO' },
+      { id: 'routine-day-0', weekday: 0, label: 'DOMINGO' }
+    ];
+
+    function getRoutineRoot() {
+      return rootLevel.children.find((task) => task.id === routineRootId)
+        || rootLevel.children.find((task) => normalizeTaskTitleKey(task.title) === 'rotina')
+        || null;
+    }
+
+    function getRoutineDayDefinitionForLevel(level) {
+      let current = level;
+
+      while (current && current !== rootLevel) {
+        const definition = routineDayDefinitions.find((day) => day.id === current.id);
+        if (definition && current.parent && current.parent.id === routineRootId) {
+          return definition;
+        }
+        current = current.parent;
+      }
+
+      return null;
+    }
+
+    function getRoutineDayDefinitionForTask(task) {
+      return task?.parent ? getRoutineDayDefinitionForLevel(task.parent) : null;
+    }
+
+    function isRoutineDayStructureTask(task) {
+      return Boolean(
+        task
+        && task.parent?.id === routineRootId
+        && routineDayDefinitions.some((day) => day.id === task.id)
+      );
+    }
+
+    function isRoutineStructureTask(task) {
+      if (!task) return false;
+      if (task.id === routineRootId) return true;
+      return isRoutineDayStructureTask(task);
+    }
+
+    function isRoutineRecurringTask(task) {
+      return Boolean(task && task.parent && getRoutineDayDefinitionForTask(task));
+    }
+
+    function getDateOnOrAfterForWeekday(referenceValue, weekday) {
+      const normalizedReference = normalizePlannedDate(referenceValue);
+      const referenceDate = normalizedReference ? parseLocalDate(normalizedReference) : getTodayStart();
+      const date = new Date(referenceDate.getFullYear(), referenceDate.getMonth(), referenceDate.getDate());
+      const delta = (weekday - date.getDay() + 7) % 7;
+      date.setDate(date.getDate() + delta);
+      return formatDateValue(date);
+    }
+
+    function getNextRoutineDueDate(task) {
+      const routineDay = getRoutineDayDefinitionForTask(task);
+      if (!routineDay) return null;
+
+      const recurrence = task.recurrence === 'biweekly' ? 'biweekly' : 'weekly';
+      const today = getTodayStart();
+      const currentDueDate = normalizePlannedDate(task.dueDate) || normalizePlannedDate(task.plannedDate);
+      let nextDate = currentDueDate
+        ? addRecurrenceInterval(parseLocalDate(currentDueDate), recurrence)
+        : parseLocalDate(getDateOnOrAfterForWeekday(formatDateValue(today), routineDay.weekday));
+
+      if (!currentDueDate && nextDate <= today) {
+        nextDate = addRecurrenceInterval(nextDate, recurrence);
+      }
+      while (nextDate <= today) {
+        nextDate = addRecurrenceInterval(nextDate, recurrence);
+      }
+      return formatDateValue(nextDate);
+    }
+
+    function syncRoutineTask(task, routineDay, referenceValue = formatDateValue(getTodayStart())) {
+      if (!task || !routineDay) return false;
+
+      if (taskHasSubtasks(task)) {
+        return clearSchedulingFromParentTask(task);
+      }
+
+      let changed = false;
+      const currentDueDate = normalizePlannedDate(task.dueDate);
+      let dueDate = currentDueDate;
+      const recurrence = task.recurrence === 'biweekly' ? 'biweekly' : 'weekly';
+
+      if (task.recurrence !== recurrence) {
+        task.recurrence = recurrence;
+        changed = true;
+      }
+
+      if (!dueDate && (!normalizeTime(task.startTime) || !normalizeTime(task.endTime))) {
+        return changed;
+      }
+
+      if (!dueDate || parseLocalDate(dueDate).getDay() !== routineDay.weekday) {
+        dueDate = getDateOnOrAfterForWeekday(dueDate || referenceValue, routineDay.weekday);
+      }
+
+      if (task.dueDate !== dueDate) {
+        task.dueDate = dueDate;
+        changed = true;
+      }
+      if (task.plannedDate !== dueDate) {
+        task.plannedDate = dueDate;
+        changed = true;
+      }
+      if (task.checked) {
+        task.checked = false;
+        changed = true;
+      }
+      return changed;
+    }
+
+    function syncRoutineDescendants(dayTask, routineDay) {
+      let changed = false;
+      const visit = (task) => {
+        if (syncRoutineTask(task, routineDay)) changed = true;
+        task.children.forEach(visit);
+      };
+      dayTask.children.forEach(visit);
+      return changed;
+    }
+
+    function ensureRoutineStructure() {
+      let changed = false;
+      let routineRoot = getRoutineRoot();
+
+      if (!routineRoot) {
+        routineRoot = createTaskData('ROTINA', rootLevel, null, [], routineRootId);
+        rootLevel.children.unshift(routineRoot);
+        changed = true;
+      } else if (routineRoot.id !== routineRootId) {
+        routineRoot.id = routineRootId;
+        changed = true;
+      }
+
+      routineRoot.title = normalizeTaskTitle('ROTINA');
+      if (routineRoot.dueDate !== null) changed = true;
+      if (routineRoot.recurrence !== null) changed = true;
+      if (routineRoot.plannedDate !== null) changed = true;
+      if (routineRoot.checked) changed = true;
+      routineRoot.dueDate = null;
+      routineRoot.recurrence = null;
+      routineRoot.plannedDate = null;
+      routineRoot.checked = false;
+
+      routineDayDefinitions.forEach((definition) => {
+        let dayTask = routineRoot.children.find((task) => task.id === definition.id)
+          || routineRoot.children.find((task) => normalizeTaskTitleKey(task.title) === normalizeTaskTitleKey(definition.label));
+
+        if (!dayTask) {
+          dayTask = createTaskData(definition.label, routineRoot, null, [], definition.id);
+          routineRoot.children.push(dayTask);
+          changed = true;
+        } else if (dayTask.id !== definition.id) {
+          dayTask.id = definition.id;
+          changed = true;
+        }
+
+        dayTask.parent = routineRoot;
+        // O nome persistido dos dias também fica em maiúsculas para que
+        // breadcrumbs, caminhos e demais telas usem o mesmo padrão visual.
+        dayTask.title = definition.label.toLocaleUpperCase('pt-BR');
+        if (dayTask.dueDate !== null) changed = true;
+        if (dayTask.recurrence !== null) changed = true;
+        if (dayTask.plannedDate !== null) changed = true;
+        if (dayTask.checked) changed = true;
+        dayTask.dueDate = null;
+        dayTask.recurrence = null;
+        dayTask.plannedDate = null;
+        dayTask.checked = false;
+
+        if (syncRoutineDescendants(dayTask, definition)) changed = true;
+      });
+
+      // A ordem dos dias da ROTINA é estrutural e nunca depende de prazo,
+      // quantidade de subtarefas ou quantidade de tarefas vencidas.
+      const routineDayIds = new Set(routineDayDefinitions.map((definition) => definition.id));
+      const orderedRoutineDays = routineDayDefinitions
+        .map((definition) => routineRoot.children.find((task) => task.id === definition.id))
+        .filter(Boolean);
+      const nonDayChildren = routineRoot.children.filter((task) => !routineDayIds.has(task.id));
+      const desiredRoutineChildren = [...orderedRoutineDays, ...nonDayChildren];
+
+      if (
+        desiredRoutineChildren.length !== routineRoot.children.length
+        || desiredRoutineChildren.some((task, index) => routineRoot.children[index] !== task)
+      ) {
+        routineRoot.children = desiredRoutineChildren;
+        changed = true;
+      }
+
+      return changed;
+    }
+
+    let draggedPlannedTaskId = null;
+
+    function clearPlanningDropTargets() {
+      document.querySelectorAll('.is-drop-target').forEach((element) => {
+        element.classList.remove('is-drop-target');
+      });
+    }
+
+    function bindPlanningDropZone(element, dateValue) {
+      const normalizedDate = normalizePlannedDate(dateValue);
+      if (!normalizedDate) return;
+
+      element.addEventListener('dragover', (event) => {
+        if (calendarInteractionMode !== 'move') return;
+        const taskId = draggedPlannedTaskId || event.dataTransfer?.getData('text/plain');
+        if (!taskId) return;
+        event.preventDefault();
+        if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+        element.classList.add('is-drop-target');
+      });
+
+      element.addEventListener('dragleave', (event) => {
+        if (!element.contains(event.relatedTarget)) element.classList.remove('is-drop-target');
+      });
+
+      element.addEventListener('drop', (event) => {
+        if (calendarInteractionMode !== 'move') return;
+        event.preventDefault();
+        const taskId = draggedPlannedTaskId || event.dataTransfer?.getData('text/plain');
+        clearPlanningDropTargets();
+        if (!taskId) return;
+
+        const task = findTaskById(taskId);
+        if (!task || task.checked || isRoutineRecurringTask(task)) return;
+        if (!canScheduleTaskOnDate(task, normalizedDate, task.startTime, task.endTime, true)) {
+          draggedPlannedTaskId = null;
+          return;
+        }
+        planTask(task, normalizedDate);
+        draggedPlannedTaskId = null;
+        saveAppState();
+        renderTodayTab();
+        renderCalendarWeek();
+      });
+    }
+
+
+
+    function normalizePlannedDate(value) {
+      return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : null;
+    }
+
+    function syncDatedTasksToPlanning() {
+      let changed = false;
+      getAllTasks().forEach((task) => {
+        if (taskHasSubtasks(task)) {
+          if (clearSchedulingFromParentTask(task)) changed = true;
+          return;
+        }
+        const dueDate = normalizePlannedDate(task.dueDate);
+        if (!dueDate || task.checked) return;
+        if (!normalizePlannedDate(task.plannedDate)) {
+          task.plannedDate = dueDate;
+          changed = true;
+        }
+      });
+      if (changed) syncTodayPlanFromTaskPlans();
+      return changed;
+    }
+
+
+
+
+
+
+
+    function getTasksPlannedFor(dateValue) {
+      return getAllTasks().filter((task) => !task.checked && task.plannedDate === dateValue);
+    }
+
+    function getCalendarTasksForDate(dateValue) {
+      const normalizedDate = normalizePlannedDate(dateValue);
+      if (!normalizedDate) return [];
+      return getAllTasks()
+        .filter((task) => !task.checked && !taskHasSubtasks(task) && getExecutionScheduledDate(task) === normalizedDate)
+        .sort((firstTask, secondTask) => {
+          const firstStart = timeToMinutes(firstTask.startTime);
+          const secondStart = timeToMinutes(secondTask.startTime);
+          if (firstStart !== null || secondStart !== null) {
+            if (firstStart === null) return 1;
+            if (secondStart === null) return -1;
+            if (firstStart !== secondStart) return firstStart - secondStart;
+          }
+          return getTaskPath(firstTask).localeCompare(getTaskPath(secondTask), 'pt-BR');
+        });
+    }
+
+    function sortTodayPlan() {
+      todayPlan.sort((firstTask, secondTask) => {
+        const firstStart = timeToMinutes(firstTask.startTime);
+        const secondStart = timeToMinutes(secondTask.startTime);
+        if (firstStart !== null || secondStart !== null) {
+          if (firstStart === null) return 1;
+          if (secondStart === null) return -1;
+          if (firstStart !== secondStart) return firstStart - secondStart;
+        }
+        return getTaskPath(firstTask).localeCompare(getTaskPath(secondTask), 'pt-BR');
+      });
+    }
+
+    function syncTodayPlanFromTaskPlans() {
+      const todayValue = formatDateValue(getTodayStart());
+      const plannedToday = getAllTasks().filter((task) => task.plannedDate === todayValue);
+      const plannedIds = new Set(plannedToday.map((task) => task.id));
+      todayPlan = todayPlan.filter((task) => plannedIds.has(task.id));
+      const existingIds = new Set(todayPlan.map((task) => task.id));
+      plannedToday.forEach((task) => {
+        if (!existingIds.has(task.id)) {
+          todayPlan.push(task);
+        }
+      });
+      sortTodayPlan();
+    }
+
+    function planTask(task, dateValue) {
+      if (!task || taskHasSubtasks(task)) return;
+      const normalizedDate = normalizePlannedDate(dateValue);
+      if (!normalizedDate) return;
+      task.plannedDate = normalizedDate;
+      task.dueDate = normalizedDate;
+      syncTodayPlanFromTaskPlans();
+    }
+
+    function getRecurrenceLabel(value) {
+      const labels = { daily: 'Diária', weekly: 'Semanal', biweekly: 'Quinzenal', monthly: 'Mensal' };
+      return labels[normalizeRecurrence(value)] || 'Sem recorrência';
+    }
+
+    function addMonthsSafely(date, monthsToAdd) {
+      const nextDate = new Date(date.getFullYear(), date.getMonth(), 1);
+      const originalDay = date.getDate();
+      nextDate.setMonth(nextDate.getMonth() + monthsToAdd);
+      const lastDayOfTargetMonth = new Date(nextDate.getFullYear(), nextDate.getMonth() + 1, 0).getDate();
+      nextDate.setDate(Math.min(originalDay, lastDayOfTargetMonth));
+      return nextDate;
+    }
+
+    function addRecurrenceInterval(date, recurrence) {
+      const nextDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      if (recurrence === 'daily') nextDate.setDate(nextDate.getDate() + 1);
+      else if (recurrence === 'weekly') nextDate.setDate(nextDate.getDate() + 7);
+      else if (recurrence === 'biweekly') nextDate.setDate(nextDate.getDate() + 14);
+      else if (recurrence === 'monthly') return addMonthsSafely(nextDate, 1);
+      return nextDate;
+    }
+
+    function getNextDueDateForRecurrence(task, referenceDateValue = lastKnownDate) {
+      const recurrence = normalizeRecurrence(task.recurrence);
+
+      if (!recurrence) {
+        return task.dueDate || null;
+      }
+
+      const referenceDate = parseLocalDate(referenceDateValue || formatDateValue(getTodayStart()));
+      let nextDate = task.dueDate
+        ? parseLocalDate(task.dueDate)
+        : parseLocalDate(referenceDateValue || formatDateValue(getTodayStart()));
+
+      nextDate = addRecurrenceInterval(nextDate, recurrence);
+
+      while (nextDate <= referenceDate) {
+        nextDate = addRecurrenceInterval(nextDate, recurrence);
+      }
+
+      return formatDateValue(nextDate);
+    }
+
+    function getConclusionPercentage(completedTasks, plannedTasks) {
+      if (!plannedTasks) {
+        return 0;
+      }
+
+      return Math.min(100, Math.floor((completedTasks / plannedTasks) * 100));
+    }
+
+    function normalizeDailyReport(report) {
+      if (!report || typeof report.date !== 'string') {
+        return null;
+      }
+
+      const plannedTasks = Math.max(0, Math.floor(Number(report.plannedTasks) || 0));
+      const completedTasks = Math.min(
+        Math.max(0, Math.floor(Number(report.completedTasks) || 0)),
+        plannedTasks
+      );
+
+      if (!plannedTasks && !completedTasks) {
+        return null;
+      }
+
+      return {
+        date: report.date,
+        plannedTasks,
+        completedTasks,
+        conclusion: getConclusionPercentage(completedTasks, plannedTasks)
+      };
+    }
+
+    function serializeTask(task) {
+      return {
+        id: task.id,
+        title: task.title,
+        dueDate: task.dueDate,
+        checked: task.checked,
+        recurrence: task.recurrence,
+        plannedDate: task.plannedDate,
+        blocksRequired: normalizeBlocksRequired(task.blocksRequired),
+        startTime: normalizeTime(task.startTime),
+        endTime: normalizeTime(task.endTime),
+        children: task.children.map(serializeTask)
+      };
+    }
+
+    function hydrateTask(savedTask, parent) {
+      const task = createTaskData(
+        savedTask.title, parent, savedTask.dueDate || null, [], savedTask.id,
+        Boolean(savedTask.checked), normalizeRecurrence(savedTask.recurrence),
+        normalizePlannedDate(savedTask.plannedDate),
+        normalizeBlocksRequired(savedTask.blocksRequired),
+        normalizeTime(savedTask.startTime), normalizeTime(savedTask.endTime)
+      );
+      task.children = (savedTask.children || []).map((child) => hydrateTask(child, task));
+      return task;
+    }
+
+    function getAppState() {
+      return {
+        version: 8,
+        updatedAt: new Date().toISOString(),
+        tasks: rootLevel.children.map(serializeTask),
+        todayPlanIds: todayPlan.map((task) => task.id),
+        dailyReports,
+        appTheme,
+        settings: {
+          blockDurationMinutes: normalizeBlockDurationMinutes(blockDurationMinutes)
+        },
+        lastKnownDate,
+        executionState: getSerializableExecutionState()
+      };
+    }
+
+    function saveAppState(options = {}) {
+      enforceParentTaskSchedulingRules();
+
+      if (!options.skipServer && !isApplyingRemoteState) {
+        scheduleServerSave();
+      }
+    }
+
+    function applyLoadedState(state) {
+      const safeState = state && typeof state === 'object' ? state : {};
+      nextTaskId = 1;
+      rootLevel.children = (safeState.tasks || []).map((task) => hydrateTask(task, rootLevel));
+      todayPlan = (safeState.todayPlanIds || []).map(findTaskById).filter(Boolean);
+      const loadedPlanDate = safeState.lastKnownDate || formatDateValue(getTodayStart());
+      todayPlan.forEach((task) => {
+        if (!task.plannedDate) task.plannedDate = loadedPlanDate;
+      });
+      dailyReports = Array.isArray(safeState.dailyReports)
+        ? safeState.dailyReports.map(normalizeDailyReport).filter(Boolean)
+        : [];
+      applyTheme(safeState.appTheme || safeState.theme || appTheme);
+      blockDurationMinutes = normalizeBlockDurationMinutes(
+        safeState.settings?.blockDurationMinutes ?? safeState.blockDurationMinutes ?? 30
+      );
+      recalculateTaskBlocksFromTimes();
+      updateBlockDurationControls();
+      lastKnownDate = safeState.lastKnownDate || formatDateValue(getTodayStart());
+      executionState = normalizeExecutionState(safeState.executionState);
+      currentLevel = rootLevel;
+      ensureRoutineStructure();
+      enforceParentTaskSchedulingRules();
+      syncDatedTasksToPlanning();
+    }
+
+    function findTaskById(taskId) {
+      return getAllTasks().find((task) => task.id === taskId);
+    }
+
+    async function loadAppState() {
+      updateServerSyncStatus('Carregando dados do servidor...', 'syncing');
+
+      try {
+        const response = await fetch('/api/state', {
+          headers: {
+            Accept: 'application/json'
+          }
+        });
+
+        if (response.status === 401) {
+          window.location.replace('/login.html');
+          return false;
+        }
+
+        if (!response.ok) {
+          throw new Error(`Falha ao carregar dados (${response.status}).`);
+        }
+
+        const state = await response.json();
+        isApplyingRemoteState = true;
+        applyLoadedState(state);
+        updateServerSyncStatus('Dados sincronizados com o servidor.', 'connected');
+        return true;
+      } catch (error) {
+        console.warn('Não foi possível carregar os dados do servidor.', error);
+        updateServerSyncStatus('Não foi possível carregar os dados. Verifique sua conexão.', 'error');
+        return false;
+      } finally {
+        isApplyingRemoteState = false;
+      }
+    }
+
+    function resetAppState() {
+      rootLevel.children = [];
+      currentLevel = rootLevel;
+      pendingDeleteTask = null;
+      todayPlan = [];
+      dailyReports = [];
+      blockDurationMinutes = 30;
+      updateBlockDurationControls();
+      executionState = normalizeExecutionState(null);
+      nextTaskId = 1;
+      lastKnownDate = formatDateValue(getTodayStart());
+      ensureRoutineStructure();
+      saveAppState();
+      renderCurrentLevel();
+      renderTodayTab();
+    }
+
+
+    const tabSequence = ['hoje', 'planejamento', 'calendario', 'fila', 'configuracoes'];
+    const tabLabels = {
+      hoje: 'Execução',
+      planejamento: 'Planejamento',
+      calendario: 'Semana',
+      fila: 'Fila',
+      configuracoes: 'Configurações'
+    };
+
+    function closeMobileTabMenu() {
+      mobileTabMenu?.classList.remove('open');
+      mobileTabMenuButton?.setAttribute('aria-expanded', 'false');
+    }
+
+    function updateMobileTabNavigation(selectedTab) {
+      if (mobileTabCurrent) {
+        mobileTabCurrent.textContent = tabLabels[selectedTab] || selectedTab;
+      }
+      mobileTabMenuItems.forEach((item) => {
+        item.classList.toggle('active', item.dataset.mobileTab === selectedTab);
+      });
+    }
+
+    function activateTab(selectedTab) {
+      refreshDateSensitiveViews();
+
+      tabButtons.forEach((tabButton) => {
+        const isActive = tabButton.dataset.tab === selectedTab;
+        tabButton.classList.toggle('active', isActive);
+        tabButton.setAttribute('aria-selected', String(isActive));
+      });
+
+      tabPanels.forEach((panel) => {
+        panel.classList.toggle('active', panel.id === selectedTab);
+      });
+
+      if (selectedTab === 'hoje') {
+        renderTodayTab();
+      }
+
+      if (selectedTab === 'calendario') {
+        calendarWeekStart = getCalendarWeekStart();
+        renderCalendarWeek();
+        requestAnimationFrame(scrollCalendarToTodayOnMobile);
+      }
+
+      if (selectedTab === 'fila') {
+        renderQueue();
+      }
+
+      updateMobileTabNavigation(selectedTab);
+      closeMobileTabMenu();
+    }
+
+    tabButtons.forEach((button) => {
+      button.id = `tab-${button.dataset.tab}`;
+      button.addEventListener('click', () => {
+        activateTab(button.dataset.tab);
+      });
+    });
+
+    mobileTabMenuButton?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const willOpen = !mobileTabMenu?.classList.contains('open');
+      mobileTabMenu?.classList.toggle('open', willOpen);
+      mobileTabMenuButton.setAttribute('aria-expanded', String(willOpen));
+    });
+
+    mobileTabMenuItems.forEach((item) => {
+      item.addEventListener('click', () => {
+        activateTab(item.dataset.mobileTab);
+        closeMobileTabMenu();
+      });
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!mobileTabMenu?.contains(event.target) && event.target !== mobileTabMenuButton) {
+        closeMobileTabMenu();
+      }
+    });
+
+    updateMobileTabNavigation(document.querySelector('.tab-button.active')?.dataset.tab || 'hoje');
+
+    function getCurrentPath() {
+      const path = [];
+      let level = currentLevel;
+
+      while (level) {
+        path.unshift(level);
+        level = level.parent;
+      }
+
+      return path;
+    }
+
+    function renderBreadcrumb() {
+      breadcrumb.innerHTML = '';
+      const path = getCurrentPath();
+
+      path.forEach((level, index) => {
+        if (index > 0) {
+          const separator = document.createElement('span');
+          separator.textContent = '/';
+          breadcrumb.append(separator);
+        }
+
+        const button = document.createElement('button');
+        button.className = 'breadcrumb-button';
+        button.type = 'button';
+        applyTaskNamePresentation(button, level);
+
+        if (level === currentLevel) {
+          button.classList.add('active');
+
+          if (level.parent && !isRoutineStructureTask(level)) {
+            button.classList.add('editable');
+            button.disabled = false;
+            button.title = 'Editar tarefa';
+            button.setAttribute('aria-label', `Editar ${level.title}`);
+            button.addEventListener('click', () => openEditTaskModal(level));
+          } else {
+            button.disabled = true;
+          }
+        } else {
+          button.addEventListener('click', () => {
+            currentLevel = level;
+            renderCurrentLevel();
+          });
+        }
+
+        breadcrumb.append(button);
+      });
+
+      deleteCurrentButton.classList.toggle('visible', currentLevel.parent !== null && !isRoutineStructureTask(currentLevel));
+    }
+
+    function parseLocalDate(dateValue) {
+      const [year, month, day] = dateValue.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    }
+
+    function getTodayStart() {
+      const today = new Date();
+      return new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    }
+
+    function formatDateValue(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+
+      return `${year}-${month}-${day}`;
+    }
+
+    function getDateFromDays(days) {
+      const dueDate = getTodayStart();
+      dueDate.setDate(dueDate.getDate() + days);
+
+      return formatDateValue(dueDate);
+    }
+
+    function rescheduleUncompletedRoutineTasks(currentDateValue) {
+      const normalizedCurrentDate = normalizePlannedDate(currentDateValue);
+      if (!normalizedCurrentDate) return false;
+      let changed = false;
+      getAllTasks().forEach((task) => {
+        if (!isRoutineRecurringTask(task) || taskHasSubtasks(task) || task.checked) return;
+        const scheduledDate = normalizePlannedDate(task.plannedDate) || normalizePlannedDate(task.dueDate);
+        if (!scheduledDate || scheduledDate >= normalizedCurrentDate) return;
+        const recurrence = task.recurrence === 'biweekly' ? 'biweekly' : 'weekly';
+        let nextDate = parseLocalDate(scheduledDate);
+        const currentDate = parseLocalDate(normalizedCurrentDate);
+        do { nextDate = addRecurrenceInterval(nextDate, recurrence); } while (nextDate < currentDate);
+        const nextValue = formatDateValue(nextDate);
+        task.recurrence = recurrence;
+        task.dueDate = nextValue;
+        task.plannedDate = nextValue;
+        task.checked = false;
+        changed = true;
+      });
+      return changed;
+    }
+
+    function refreshDateSensitiveViews() {
+      const currentDate = formatDateValue(getTodayStart());
+
+      if (currentDate === lastKnownDate) {
+        return;
+      }
+
+      const previousDate = lastKnownDate;
+
+      // Congela o total planejado do dia encerrado antes de mover qualquer tarefa.
+      // Tarefas de rotina não concluídas permanecem no denominador e NÃO entram
+      // como concluídas, pois este fluxo não chama recordDailyCompletion().
+      rememberDailyPlannedCount(previousDate);
+      saveDailyReportSnapshot(previousDate);
+
+      // Rotinas não concluídas não viram pendências comuns: são reagendadas para
+      // a próxima ocorrência válida do respectivo dia da semana.
+      rescheduleUncompletedRoutineTasks(currentDate);
+
+      // O que ficou pendente no dia anterior e não é rotina volta para hoje.
+      getAllTasks().forEach((task) => {
+        if (isRoutineRecurringTask(task)) {
+          return;
+        }
+        if (task.plannedDate && task.plannedDate < currentDate && !task.checked) {
+          task.plannedDate = currentDate;
+        }
+      });
+
+      lastKnownDate = currentDate;
+      syncTodayPlanFromTaskPlans();
+      renderCurrentLevel();
+      renderTodayTab();
+      renderQueue();
+      if (calendarWeekStart) renderCalendarWeek();
+      saveAppState();
+    }
+
+    function getDaysRemaining(dateValue) {
+      const millisecondsPerDay = 24 * 60 * 60 * 1000;
+      const dueDate = parseLocalDate(dateValue);
+      const today = getTodayStart();
+
+      return Math.round((dueDate - today) / millisecondsPerDay);
+    }
+
+
+
+
+    function getDaysLabel(dateValue) {
+      const daysRemaining = getDaysRemaining(dateValue);
+
+      if (daysRemaining === 0) {
+        return 'Vence hoje';
+      }
+
+      if (daysRemaining > 0) {
+        return `${daysRemaining} dia(s)`;
+      }
+
+      return `${Math.abs(daysRemaining)} dia(s) atrasada`;
+    }
+
+    function getDaysClass(dateValue) {
+      const daysRemaining = getDaysRemaining(dateValue);
+
+      if (daysRemaining === 0) {
+        return 'due-today';
+      }
+
+      if (daysRemaining < 0) {
+        return 'overdue';
+      }
+
+      return '';
+    }
+
+    function getSelectedCompletionAction() {
+      if (pendingCompletionTask && isRoutineRecurringTask(pendingCompletionTask)) {
+        return 'routine-next';
+      }
+      return completionActionInputs.find((input) => input.checked)?.value || null;
+    }
+
+    function updateCompletionModalState() {
+      if (pendingCompletionTask && isRoutineRecurringTask(pendingCompletionTask)) {
+        completionOptions.hidden = true;
+        completionNewDateField.hidden = true;
+        completionRoutineConfirm.hidden = false;
+        confirmCompletionButton.disabled = !normalizePlannedDate(pendingRoutineNextDate);
+        return;
+      }
+
+      completionOptions.hidden = false;
+      completionRoutineConfirm.hidden = true;
+      const action = getSelectedCompletionAction();
+      const needsNewDate = action === 'reschedule';
+      completionNewDateField.hidden = !needsNewDate;
+      confirmCompletionButton.textContent = action === 'postpone'
+        ? 'Adiar tarefa'
+        : 'Confirmar conclusão';
+
+      const hasValidDate = Boolean(normalizePlannedDate(completionNewDateInput.value));
+      confirmCompletionButton.disabled = !action || (needsNewDate && !hasValidDate);
+    }
+
+    function openCompletionModal(task) {
+      if (!task || !task.parent) return;
+
+      pendingCompletionTask = task;
+      pendingRoutineNextDate = null;
+      completionActionInputs.forEach((input) => {
+        input.checked = false;
+      });
+      completionNewDateInput.value = '';
+      completionNewDateField.hidden = true;
+
+      if (isRoutineRecurringTask(task)) {
+        const routineDay = getRoutineDayDefinitionForTask(task);
+        pendingRoutineNextDate = getNextRoutineDueDate(task);
+        completionMessage.textContent = `Confirma que “${getTaskDisplayTitle(task)}” foi concluída? A próxima execução será reagendada automaticamente (${getRecurrenceLabel(task.recurrence).toLowerCase()}) para ${routineDay.label.toLowerCase()}.`;
+        completionRoutineDate.textContent = pendingRoutineNextDate
+          ? `${formatReportDate(pendingRoutineNextDate)} · ${routineDay.label}`
+          : routineDay.label;
+        completionOptions.hidden = true;
+        completionRoutineConfirm.hidden = false;
+        confirmCompletionButton.textContent = 'Confirmar nova data';
+        confirmCompletionButton.disabled = !pendingRoutineNextDate;
+        completionModal.classList.add('visible');
+        confirmCompletionButton.focus();
+        return;
+      }
+
+      completionMessage.textContent = `Confirma que “${getTaskDisplayTitle(task)}” foi concluída? Escolha o que deve acontecer com a tarefa.`;
+      completionOptions.hidden = false;
+      completionRoutineConfirm.hidden = true;
+      confirmCompletionButton.textContent = 'Confirmar conclusão';
+      confirmCompletionButton.disabled = true;
+      completionModal.classList.add('visible');
+      completionActionInputs[0]?.focus();
+    }
+
+    function closeCompletionModal() {
+      pendingCompletionTask = null;
+      pendingRoutineNextDate = null;
+      completionActionInputs.forEach((input) => {
+        input.checked = false;
+      });
+      completionNewDateInput.value = '';
+      completionNewDateField.hidden = true;
+      completionOptions.hidden = false;
+      completionRoutineConfirm.hidden = true;
+      completionRoutineDate.textContent = '';
+      confirmCompletionButton.textContent = 'Confirmar conclusão';
+      confirmCompletionButton.disabled = true;
+      completionModal.classList.remove('visible');
+    }
+
+    function removeCompletedTask(task) {
+      if (!task || !task.parent) return;
+      const parentLevel = task.parent;
+      parentLevel.children = parentLevel.children.filter((child) => child !== task);
+      cleanupTodayPlan(task);
+
+      if (isTaskInsideDeletedTask(currentLevel, task)) {
+        currentLevel = parentLevel;
+      }
+    }
+
+    function finalizeTaskCompletion(task, action, newDate = null) {
+      if (!task || !task.parent) return false;
+
+      const wasAlreadyCompleted = Boolean(task.checked);
+      const isPostponing = action === 'postpone';
+      rememberDailyPlannedCount(formatDateValue(getTodayStart()));
+      if (!wasAlreadyCompleted && !isPostponing) recordDailyCompletion();
+
+      if (action === 'delete') {
+        removeCompletedTask(task);
+      } else if (action === 'reschedule') {
+        const normalizedDate = normalizePlannedDate(newDate);
+        if (!normalizedDate || !canScheduleTaskOnDate(task, normalizedDate, task.startTime, task.endTime, true)) return false;
+        task.checked = false;
+        task.dueDate = normalizedDate;
+        task.plannedDate = normalizedDate;
+      } else if (action === 'postpone') {
+        const tomorrow = addCalendarDays(getTodayStart(), 1);
+        const tomorrowValue = formatDateValue(tomorrow);
+        if (!canScheduleTaskOnDate(task, tomorrowValue, task.startTime, task.endTime, true)) return false;
+        task.checked = false;
+        task.dueDate = tomorrowValue;
+        task.plannedDate = tomorrowValue;
+      } else if (action === 'undated') {
+        task.checked = false;
+        task.dueDate = null;
+        task.plannedDate = null;
+      } else if (action === 'routine-next') {
+        const routineDay = getRoutineDayDefinitionForTask(task);
+        const normalizedDate = normalizePlannedDate(newDate || pendingRoutineNextDate);
+        if (!routineDay || !normalizedDate || parseLocalDate(normalizedDate).getDay() !== routineDay.weekday) return false;
+        if (!canScheduleTaskOnDate(task, normalizedDate, task.startTime, task.endTime, true)) return false;
+        task.checked = false;
+        task.recurrence = task.recurrence === 'biweekly' ? 'biweekly' : 'weekly';
+        task.dueDate = normalizedDate;
+        task.plannedDate = normalizedDate;
+      } else {
+        return false;
+      }
+
+      cleanupTodayPlan();
+      syncTodayPlanFromTaskPlans();
+      return true;
+    }
+
+    function createDueCheckbox(task) {
+      const wrapper = document.createElement('label');
+      wrapper.className = 'due-checkbox-wrap';
+      wrapper.title = 'Concluir tarefa';
+      wrapper.addEventListener('click', (event) => {
+        event.stopPropagation();
+      });
+
+      const checkbox = document.createElement('input');
+      checkbox.className = 'due-checkbox';
+      checkbox.type = 'checkbox';
+      checkbox.checked = Boolean(task.checked);
+      checkbox.setAttribute('aria-label', `Concluir ${task.title}`);
+
+      checkbox.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        checkbox.checked = Boolean(task.checked);
+        openCompletionModal(task);
+      });
+
+      wrapper.append(checkbox);
+      return wrapper;
+    }
+
+    completionActionInputs.forEach((input) => {
+      input.addEventListener('change', () => {
+        updateCompletionModalState();
+        if (input.checked && input.value === 'reschedule') {
+          completionNewDateInput.focus();
+        }
+      });
+    });
+
+    completionNewDateInput.addEventListener('input', updateCompletionModalState);
+    completionNewDateInput.addEventListener('change', updateCompletionModalState);
+    cancelCompletionButton.addEventListener('click', closeCompletionModal);
+
+    confirmCompletionButton.addEventListener('click', () => {
+      const task = pendingCompletionTask;
+      const action = getSelectedCompletionAction();
+      const newDate = action === 'routine-next'
+        ? pendingRoutineNextDate
+        : action === 'reschedule'
+          ? completionNewDateInput.value
+          : null;
+
+      if (!task || !action) return;
+      if (action === 'reschedule' && !normalizePlannedDate(newDate)) {
+        completionNewDateInput.focus();
+        return;
+      }
+
+      if (!finalizeTaskCompletion(task, action, newDate)) return;
+
+      saveDailyReportSnapshot(lastKnownDate);
+      closeCompletionModal();
+      saveAppState();
+      renderCurrentLevel();
+      renderTodayTab();
+      renderQueue();
+      if (calendarWeekStart) renderCalendarWeek();
+    });
+
+
+    function isTaskOverdue(task) {
+      return !task.checked && task.dueDate && getDaysRemaining(task.dueDate) <= 0;
+    }
+
+    function countOverdueSubtasks(task) {
+      return task.children.reduce((total, child) => {
+        const childIsOverdue = isTaskOverdue(child) ? 1 : 0;
+        return total + childIsOverdue + countOverdueSubtasks(child);
+      }, 0);
+    }
+
+    function updateTaskStatus(titleButton, task) {
+      const hasSubtasks = task.children.length > 0;
+      titleButton.classList.toggle('has-status', hasSubtasks);
+      titleButton.dataset.status = hasSubtasks
+        ? `${countOverdueSubtasks(task)} vencida(s)`
+        : '';
+    }
+
+    function getSortedTasks(tasks) {
+      return [...tasks].sort((firstTask, secondTask) => {
+        const firstIsRoutine = firstTask.id === routineRootId;
+        const secondIsRoutine = secondTask.id === routineRootId;
+
+        // ROTINA é um bloco especial e permanece sempre no topo do Planejamento.
+        if (firstIsRoutine !== secondIsRoutine) {
+          return firstIsRoutine ? -1 : 1;
+        }
+
+        const firstRoutineDayIndex = routineDayDefinitions.findIndex((day) => day.id === firstTask.id);
+        const secondRoutineDayIndex = routineDayDefinitions.findIndex((day) => day.id === secondTask.id);
+
+        // Dentro de ROTINA, SEGUNDA → DOMINGO é uma ordem fixa.
+        // Ela tem prioridade absoluta sobre vencimentos e quantidade de subtarefas.
+        if (firstRoutineDayIndex >= 0 || secondRoutineDayIndex >= 0) {
+          if (firstRoutineDayIndex >= 0 && secondRoutineDayIndex >= 0) {
+            return firstRoutineDayIndex - secondRoutineDayIndex;
+          }
+          return firstRoutineDayIndex >= 0 ? -1 : 1;
+        }
+
+        const firstHasSubtasks = firstTask.children.length > 0;
+        const secondHasSubtasks = secondTask.children.length > 0;
+
+        // 1) Tarefas que possuem subtarefas sempre ficam no topo.
+        if (firstHasSubtasks !== secondHasSubtasks) {
+          return firstHasSubtasks ? -1 : 1;
+        }
+
+        // 2) Entre tarefas com subtarefas, prioriza quem possui mais
+        // subtarefas vencidas ou vencendo hoje, contando toda a árvore abaixo.
+        if (firstHasSubtasks && secondHasSubtasks) {
+          const firstUrgentSubtasks = countOverdueSubtasks(firstTask);
+          const secondUrgentSubtasks = countOverdueSubtasks(secondTask);
+
+          if (firstUrgentSubtasks !== secondUrgentSubtasks) {
+            return secondUrgentSubtasks - firstUrgentSubtasks;
+          }
+
+          // Em empate, mantém a ordem original de criação.
+          return 0;
+        }
+
+        // 3) Entre tarefas sem subtarefas, as datas mais antigas ficam primeiro.
+        // Assim: vencidas há mais tempo -> vencidas recentes -> hoje -> futuras -> sem data.
+        if (firstTask.dueDate && secondTask.dueDate) {
+          return firstTask.dueDate.localeCompare(secondTask.dueDate);
+        }
+
+        if (firstTask.dueDate) {
+          return -1;
+        }
+
+        if (secondTask.dueDate) {
+          return 1;
+        }
+
+        // Sem data: mantém a ordem original de criação.
+        return 0;
+      });
+    }
+
+    function getTaskPath(task) {
+      const path = [];
+      let level = task;
+
+      while (level && level.parent) {
+        path.unshift(level.title);
+        level = level.parent;
+      }
+
+      return path.join(' / ');
+    }
+
+    function getAllTasks(level = rootLevel) {
+      return level.children.flatMap((task) => [task, ...getAllTasks(task)]);
+    }
+
+    function getTaskLevel(task) {
+      let level = 0;
+      let currentTask = task;
+
+      while (currentTask && currentTask.parent) {
+        level += 1;
+        currentTask = currentTask.parent;
+      }
+
+      return level;
+    }
+
+    function isTaskInTodayPlan(task) {
+      return todayPlan.includes(task);
+    }
+
+    function getTodayPlannedTaskCount() {
+      return todayPlan.length;
+    }
+
+    function getTodayCompletedTaskCount() {
+      return todayPlan.filter((task) => task.checked).length;
+    }
+
+    function getDailyReportSnapshot(dateValue = lastKnownDate) {
+      const history = executionState.dailyHistory[dateValue] && typeof executionState.dailyHistory[dateValue] === 'object'
+        ? executionState.dailyHistory[dateValue]
+        : {};
+      const recordedCompleted = Math.max(0, Math.floor(Number(history.completedCount) || 0));
+      const recordedPlanned = Math.max(0, Math.floor(Number(history.plannedCount) || 0));
+
+      if (dateValue === lastKnownDate) {
+        const checkedInPlan = getTodayCompletedTaskCount();
+        const completedTasks = Math.max(recordedCompleted, checkedInPlan);
+        const plannedTasks = Math.max(recordedPlanned, getTodayPlannedTaskCount() + recordedCompleted, completedTasks);
+
+        return {
+          date: dateValue,
+          plannedTasks,
+          completedTasks: Math.min(completedTasks, plannedTasks),
+          conclusion: getConclusionPercentage(Math.min(completedTasks, plannedTasks), plannedTasks)
+        };
+      }
+
+      const savedReport = dailyReports
+        .map(normalizeDailyReport)
+        .find((report) => report && report.date === dateValue);
+
+      if (savedReport) {
+        return savedReport;
+      }
+
+      if (recordedPlanned > 0) {
+        const plannedTasks = recordedPlanned;
+        const completedTasks = Math.min(recordedCompleted, plannedTasks);
+        return {
+          date: dateValue,
+          plannedTasks,
+          completedTasks,
+          conclusion: getConclusionPercentage(completedTasks, plannedTasks)
+        };
+      }
+
+      // Históricos antigos podem ter apenas a quantidade concluída, sem o total planejado.
+      // Sem denominador não inventamos uma porcentagem retroativa.
+      return {
+        date: dateValue,
+        plannedTasks: 0,
+        completedTasks: 0,
+        conclusion: 0
+      };
+    }
+
+    function shouldKeepDailyReport(report) {
+      return report.plannedTasks > 0 || report.completedTasks > 0;
+    }
+
+    function saveDailyReportSnapshot(dateValue = lastKnownDate) {
+      const report = getDailyReportSnapshot(dateValue);
+
+      if (!shouldKeepDailyReport(report)) {
+        return null;
+      }
+
+      const existingIndex = dailyReports.findIndex((savedReport) => savedReport.date === report.date);
+
+      if (existingIndex >= 0) {
+        dailyReports[existingIndex] = report;
+      } else {
+        dailyReports.push(report);
+      }
+
+      dailyReports.sort((firstReport, secondReport) => secondReport.date.localeCompare(firstReport.date));
+      return report;
+    }
+
+    function formatReportDate(dateValue) {
+      const [year, month, day] = dateValue.split('-');
+
+      if (!year || !month || !day) {
+        return dateValue;
+      }
+
+      return `${day}/${month}/${year}`;
+    }
+
+    function getReportRows() {
+      const rowsByDate = new Map();
+
+      dailyReports.forEach((report) => {
+        const normalizedReport = normalizeDailyReport(report);
+
+        if (normalizedReport && shouldKeepDailyReport(normalizedReport)) {
+          rowsByDate.set(normalizedReport.date, normalizedReport);
+        }
+      });
+
+      const todayReport = getDailyReportSnapshot(lastKnownDate);
+      if (shouldKeepDailyReport(todayReport)) {
+        rowsByDate.set(todayReport.date, todayReport);
+      }
+
+      return Array.from(rowsByDate.values())
+        .sort((firstReport, secondReport) => secondReport.date.localeCompare(firstReport.date));
+    }
+
+    function renderReportTable() {
+      const reportRows = getReportRows();
+      reportTableBody.innerHTML = '';
+
+      if (reportRows.length === 0) {
+        const emptyRow = document.createElement('tr');
+        const emptyCell = document.createElement('td');
+        emptyCell.className = 'report-empty';
+        emptyCell.colSpan = 3;
+        emptyCell.textContent = 'Nenhum dia com tarefas planejadas ainda.';
+        emptyRow.append(emptyCell);
+        reportTableBody.append(emptyRow);
+        return;
+      }
+
+      reportRows.forEach((report) => {
+        const row = document.createElement('tr');
+        const dateCell = document.createElement('td');
+        const estimatedCell = document.createElement('td');
+        const conclusionCell = document.createElement('td');
+
+        dateCell.textContent = formatReportDate(report.date);
+        estimatedCell.textContent = `${report.completedTasks}/${report.plannedTasks}`;
+        conclusionCell.className = 'report-percent';
+        conclusionCell.textContent = `${report.conclusion}%`;
+
+        row.append(dateCell, estimatedCell, conclusionCell);
+        reportTableBody.append(row);
+      });
+    }
+
+    function getExecutionScheduledDate(task) {
+      return normalizePlannedDate(task?.plannedDate) || normalizePlannedDate(task?.dueDate);
+    }
+
+    function getNextExecutionTask() {
+      return getAllTasks()
+        .filter((task) => !task.checked && !taskHasSubtasks(task) && getExecutionScheduledDate(task))
+        .sort((firstTask, secondTask) => {
+          const firstDate = getExecutionScheduledDate(firstTask);
+          const secondDate = getExecutionScheduledDate(secondTask);
+          const dateComparison = firstDate.localeCompare(secondDate);
+          if (dateComparison !== 0) return dateComparison;
+          const firstStart = timeToMinutes(firstTask.startTime);
+          const secondStart = timeToMinutes(secondTask.startTime);
+          if (firstStart !== null || secondStart !== null) {
+            if (firstStart === null) return 1;
+            if (secondStart === null) return -1;
+            if (firstStart !== secondStart) return firstStart - secondStart;
+          }
+          return getTaskPath(firstTask).localeCompare(getTaskPath(secondTask), 'pt-BR');
+        })[0] || null;
+    }
+
+    function getExecutionDateLabel(dateValue) {
+      if (!dateValue) return '';
+      const todayValue = formatDateValue(getTodayStart());
+      const tomorrow = addCalendarDays(getTodayStart(), 1);
+      const tomorrowValue = formatDateValue(tomorrow);
+      if (dateValue < todayValue) return `Atrasada · ${formatReportDate(dateValue)}`;
+      if (dateValue === todayValue) return 'Hoje';
+      if (dateValue === tomorrowValue) return 'Amanhã';
+      return formatReportDate(dateValue);
+    }
+
+    function renderNextExecutionTask() {
+      const task = getNextExecutionTask();
+      executionNextTask.innerHTML = '';
+
+      if (!task) {
+        executionNextDate.textContent = '';
+        const empty = document.createElement('div');
+        empty.className = 'execution-next-empty';
+        empty.textContent = 'Nenhuma tarefa agendada pendente.';
+        executionNextTask.append(empty);
+        return;
+      }
+
+      const scheduledDate = getExecutionScheduledDate(task);
+      executionNextDate.textContent = getExecutionDateLabel(scheduledDate);
+
+      const card = document.createElement('article');
+      card.className = 'execution-next-card';
+
+      const title = document.createElement('h3');
+      title.className = 'execution-next-title';
+      title.textContent = getTaskDisplayTitle(task);
+
+      const path = document.createElement('div');
+      path.className = 'execution-next-path';
+      path.textContent = getTaskPath(task);
+
+      const meta = document.createElement('div');
+      meta.className = 'execution-next-meta';
+      const metaParts = [
+        getTaskBlocksLabel(task),
+        formatDurationMinutes(getTaskDurationMinutes(task)),
+        getExecutionDateLabel(scheduledDate)
+      ];
+      if (task.startTime && task.endTime) metaParts.push(`${task.startTime}–${task.endTime}`);
+      meta.textContent = metaParts.join(' · ');
+
+      const actions = document.createElement('div');
+      actions.className = 'execution-next-actions';
+      const completeButton = document.createElement('button');
+      completeButton.type = 'button';
+      completeButton.className = 'primary';
+      completeButton.textContent = 'Concluir tarefa';
+      completeButton.addEventListener('click', () => openCompletionModal(task));
+
+      const editButton = document.createElement('button');
+      editButton.type = 'button';
+      editButton.textContent = 'Editar';
+      editButton.addEventListener('click', () => openEditTaskModal(task));
+      actions.append(completeButton, editButton);
+
+      card.append(title, path, meta, actions);
+      executionNextTask.append(card);
+    }
+
+    function renderTodayTab() {
+      const datedTasksChanged = syncDatedTasksToPlanning();
+      const todayPlanChanged = cleanupTodayPlan();
+      if (datedTasksChanged || todayPlanChanged) {
+        saveAppState();
+      }
+
+      syncTodayPlanFromTaskPlans();
+      renderNextExecutionTask();
+      renderTodayExecutionSummary();
+    }
+
+    function isTaskInsideDeletedTask(task, deletedTask) {
+      let level = task;
+
+      while (level) {
+        if (level === deletedTask) {
+          return true;
+        }
+
+        level = level.parent;
+      }
+
+      return false;
+    }
+
+    function cleanupTodayPlan(deletedTask = null) {
+      const existingTasks = getAllTasks();
+      const previousLength = todayPlan.length;
+      todayPlan = todayPlan.filter((task) => {
+        const taskStillExists = existingTasks.includes(task);
+        const taskWasDeleted = deletedTask && isTaskInsideDeletedTask(task, deletedTask);
+
+        return taskStillExists && !taskWasDeleted;
+      });
+
+      return previousLength !== todayPlan.length;
+    }
+
+    function normalizeExecutionState(value) {
+      const safe = value && typeof value === 'object' ? value : {};
+      const dailyHistory = safe.dailyHistory && typeof safe.dailyHistory === 'object'
+        ? safe.dailyHistory
+        : {};
+
+      return {
+        dailyHistory: { ...dailyHistory }
+      };
+    }
+
+    function getSerializableExecutionState() {
+      return normalizeExecutionState(executionState);
+    }
+
+    function rememberDailyPlannedCount(dateValue = lastKnownDate) {
+      const current = executionState.dailyHistory[dateValue] && typeof executionState.dailyHistory[dateValue] === 'object'
+        ? executionState.dailyHistory[dateValue]
+        : { completedCount: 0, plannedCount: 0 };
+      const completedCount = Math.max(0, Math.floor(Number(current.completedCount) || 0));
+      const activePlanCount = dateValue === lastKnownDate ? todayPlan.length : 0;
+      current.plannedCount = Math.max(
+        Math.max(0, Math.floor(Number(current.plannedCount) || 0)),
+        activePlanCount + completedCount
+      );
+      executionState.dailyHistory[dateValue] = current;
+      return current;
+    }
+
+    function recordDailyCompletion() {
+      const dateValue = formatDateValue(getTodayStart());
+      const current = rememberDailyPlannedCount(dateValue);
+
+      current.completedCount = (Number(current.completedCount) || 0) + 1;
+      current.plannedCount = Math.max(Number(current.plannedCount) || 0, Number(current.completedCount) || 0);
+      executionState.dailyHistory[dateValue] = current;
+
+      const historyDates = Object.keys(executionState.dailyHistory).sort().reverse();
+      historyDates.slice(45).forEach((date) => {
+        delete executionState.dailyHistory[date];
+      });
+    }
+
+    function renderConsistencyHistory() {
+      consistencyDays.innerHTML = '';
+      const today = getTodayStart();
+
+      for (let offset = 6; offset >= 0; offset -= 1) {
+        const date = new Date(today.getFullYear(), today.getMonth(), today.getDate() - offset);
+        const dateValue = formatDateValue(date);
+        const report = getDailyReportSnapshot(dateValue);
+        const percentage = Number(report?.conclusion) || 0;
+        const completedCount = Number(report?.completedTasks) || 0;
+        const plannedCount = Number(report?.plannedTasks) || 0;
+        const day = document.createElement('div');
+        day.className = 'consistency-day';
+        const dot = document.createElement('span');
+        dot.className = 'consistency-dot';
+        dot.textContent = `${percentage}%`;
+        if (percentage > 0) {
+          dot.classList.add('did-work');
+        }
+        if (offset === 0) {
+          dot.classList.add('is-today');
+        }
+        dot.title = `${formatReportDate(dateValue)}: ${completedCount} de ${plannedCount} tarefa(s) concluída(s) · ${percentage}%`;
+        dot.setAttribute('aria-label', `${formatReportDate(dateValue)}: ${percentage}% de conclusão`);
+        const ratio = document.createElement('span');
+        ratio.className = 'consistency-ratio';
+        ratio.textContent = `${completedCount}/${plannedCount}`;
+        const label = document.createElement('span');
+        label.textContent = date.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '').slice(0, 3);
+        day.append(dot, ratio, label);
+        consistencyDays.append(day);
+      }
+    }
+
+    function renderTodayExecutionSummary() {
+      const todayValue = formatDateValue(getTodayStart());
+      const history = executionState.dailyHistory[todayValue] || {};
+      const completedToday = Number(history.completedCount) || 0;
+      todayDateLabel.textContent = getTodayStart().toLocaleDateString('pt-BR', {
+        weekday: 'long',
+        day: '2-digit',
+        month: 'long'
+      });
+      todayCompletedCount.textContent = String(completedToday);
+
+      renderConsistencyHistory();
+    }
+
+    function escapeCsvValue(value) {
+      const text = String(value ?? '');
+      return `"${text.replace(/"/g, '""')}"`;
+    }
+
+    function getCsvRows(level = rootLevel) {
+      return level.children.flatMap((task) => {
+        const daysRemaining = task.dueDate ? getDaysRemaining(task.dueDate) : '';
+        const row = [
+          task.id, getTaskPath(task), getTaskLevel(task), task.title, task.dueDate || '', daysRemaining,
+          task.recurrence || '', isTaskOverdue(task) ? 'sim' : 'não', countOverdueSubtasks(task),
+          task.children.length, task.plannedDate || '', task.startTime || '', task.endTime || '',
+          normalizeBlocksRequired(task.blocksRequired), isTaskInTodayPlan(task) ? 'sim' : 'não', task.checked ? 'sim' : 'não'
+        ];
+        return [row, ...getCsvRows(task)];
+      });
+    }
+
+    function exportTasksCsv() {
+      const headers = [
+        'id',
+        'caminho',
+        'nivel',
+        'titulo',
+        'data_vencimento',
+        'dias_restantes',
+        'recorrencia',
+        'vencida_ou_vence_hoje',
+        'subtarefas_vencidas',
+        'quantidade_subtarefas',
+        'data_planejada',
+        'hora_inicio',
+        'hora_fim',
+        'blocos_necessarios',
+        'planejamento_hoje',
+        'marcado'
+      ];
+      const csvLines = [headers, ...getCsvRows()]
+        .map((row) => row.map(escapeCsvValue).join(','));
+      const csvContent = csvLines.join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `tarefas-${formatDateValue(getTodayStart())}.csv`;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function parseCsv(text) {
+      const rows = [];
+      let row = [];
+      let value = '';
+      let insideQuotes = false;
+
+      for (let index = 0; index < text.length; index += 1) {
+        const character = text[index];
+        const nextCharacter = text[index + 1];
+
+        if (character === '"' && insideQuotes && nextCharacter === '"') {
+          value += '"';
+          index += 1;
+        } else if (character === '"') {
+          insideQuotes = !insideQuotes;
+        } else if (character === ',' && !insideQuotes) {
+          row.push(value);
+          value = '';
+        } else if ((character === '\n' || character === '\r') && !insideQuotes) {
+          if (character === '\r' && nextCharacter === '\n') {
+            index += 1;
+          }
+
+          row.push(value);
+          rows.push(row);
+          row = [];
+          value = '';
+        } else {
+          value += character;
+        }
+      }
+
+      if (value !== '' || row.length > 0) {
+        row.push(value);
+        rows.push(row);
+      }
+
+      return rows.filter((csvRow) => csvRow.some((cell) => cell.trim() !== ''));
+    }
+
+    function rowsToObjects(rows) {
+      const [headers, ...dataRows] = rows;
+
+      if (!headers) {
+        return [];
+      }
+
+      return dataRows.map((row) => {
+        return headers.reduce((record, header, index) => {
+          const normalizedHeader = header.replace(/^\uFEFF/, '').trim();
+          record[normalizedHeader] = row[index] || '';
+          return record;
+        }, {});
+      });
+    }
+
+    function importTasksFromCsv(csvText) {
+      const records = rowsToObjects(parseCsv(csvText));
+      const stack = [rootLevel];
+      const importedTodayPlan = [];
+      rootLevel.children = [];
+      todayPlan = [];
+      currentLevel = rootLevel;
+      nextTaskId = 1;
+
+      records.forEach((record) => {
+        const title = (record.titulo || '').trim();
+        if (!title) return;
+        const level = Math.max(1, Number(record.nivel) || 1);
+        const parent = stack[level - 1] || rootLevel;
+        const task = createTaskData(
+          title, parent, record.data_vencimento || null, [], record.id || null, record.marcado === 'sim',
+          normalizeRecurrence(record.recorrencia || record.recurrence),
+          normalizePlannedDate(record.data_planejada || record.plannedDate),
+          normalizeBlocksRequired(record.blocos_necessarios || record.blocksRequired || 1),
+          normalizeTime(record.hora_inicio || record.startTime),
+          normalizeTime(record.hora_fim || record.endTime)
+        );
+        parent.children.push(task);
+        stack[level] = task;
+        stack.length = level + 1;
+        if (record.planejamento_hoje === 'sim') {
+          if (!task.plannedDate) task.plannedDate = formatDateValue(getTodayStart());
+          importedTodayPlan.push(task);
+        }
+      });
+
+      todayPlan = importedTodayPlan;
+      lastKnownDate = formatDateValue(getTodayStart());
+      ensureRoutineStructure();
+      syncTodayPlanFromTaskPlans();
+      saveAppState();
+      renderCurrentLevel();
+      renderTodayTab();
+    }
+
+    function updateEmptyState() {
+      emptyState.hidden = currentLevel.children.length > 0;
+      emptyState.textContent = currentLevel.parent
+        ? 'Nenhum sub-bloco criado ainda.'
+        : 'Nenhum bloco criado ainda.';
+    }
+
+    function createTaskDaysBadge(task) {
+      if (isRoutineStructureTask(task)) return null;
+      if (!task.dueDate && !task.startTime && !task.endTime && !task.blocksRequired) return null;
+
+      const badge = document.createElement('span');
+      badge.className = 'task-days';
+      const parts = [];
+      const ariaParts = [];
+      if (task.dueDate) {
+        const daysClass = getDaysClass(task.dueDate);
+        parts.push(getDaysLabel(task.dueDate));
+        ariaParts.push(`prazo: ${getDaysLabel(task.dueDate)}`);
+        if (daysClass) badge.classList.add(daysClass);
+      }
+      if (task.startTime && task.endTime) {
+        parts.push(`${task.startTime}–${task.endTime}`);
+        ariaParts.push(`horário: ${task.startTime} até ${task.endTime}`);
+      }
+      const blocks = normalizeBlocksRequired(task.blocksRequired);
+      parts.push(`${getTaskBlocksLabel(task)} · ${formatDurationMinutes(getTaskDurationMinutes(task))}`);
+      ariaParts.push(`${blocks} bloco(s), ${getTaskDurationMinutes(task)} minutos`);
+      if (task.recurrence) parts.push(getRecurrenceLabel(task.recurrence));
+      badge.textContent = parts.join(' · ');
+      badge.setAttribute('aria-label', ariaParts.join(', '));
+      return badge;
+    }
+
+    function createTaskBlock(task) {
+      const item = document.createElement('li');
+      item.className = 'task-card';
+      if (task.id === routineRootId) item.classList.add('routine-task-card');
+
+      const titleButton = document.createElement('button');
+      titleButton.className = 'task-title';
+      titleButton.type = 'button';
+      const titleContent = document.createElement('span');
+      titleContent.className = 'task-title-content';
+      if (task.dueDate && !isRoutineStructureTask(task)) titleContent.append(createDueCheckbox(task));
+      const titleText = document.createElement('span');
+      titleText.className = 'task-title-text';
+      applyTaskNamePresentation(titleText, task);
+      titleContent.append(titleText);
+      titleButton.append(titleContent);
+      updateTaskStatus(titleButton, task);
+      titleButton.addEventListener('click', () => { currentLevel = task; renderCurrentLevel(); });
+      item.append(titleButton);
+
+      const taskDaysBadge = createTaskDaysBadge(task);
+      if (taskDaysBadge) item.append(taskDaysBadge);
+
+      if (!isRoutineStructureTask(task)) {
+        const editButton = document.createElement('button');
+        editButton.className = 'edit-button';
+        editButton.type = 'button';
+        editButton.textContent = 'Editar';
+        editButton.setAttribute('aria-label', `Editar ${task.title}`);
+        editButton.addEventListener('click', () => openEditTaskModal(task));
+        item.append(editButton);
+      }
+      return item;
+    }
+
+    function closeDeleteModal() {
+      pendingDeleteTask = null;
+      deleteModal.classList.remove('visible');
+      taskInput.focus();
+    }
+
+    cancelDeleteButton.addEventListener('click', closeDeleteModal);
+
+    deleteModal.addEventListener('click', (event) => {
+      if (event.target === deleteModal) {
+        closeDeleteModal();
+      }
+    });
+
+    deleteCurrentButton.addEventListener('click', () => {
+      if (!currentLevel.parent || isRoutineStructureTask(currentLevel)) {
+        return;
+      }
+
+      pendingDeleteTask = currentLevel;
+      deleteMessage.textContent = `Essa ação remove "${currentLevel.title}" e todas as subtarefas dentro dela.`;
+      deleteModal.classList.add('visible');
+      confirmDeleteButton.focus();
+    });
+
+    confirmDeleteButton.addEventListener('click', () => {
+      if (!pendingDeleteTask || !pendingDeleteTask.parent) {
+        return;
+      }
+
+      const deletedTask = pendingDeleteTask;
+      const parentLevel = deletedTask.parent;
+      parentLevel.children = parentLevel.children.filter((child) => child !== deletedTask);
+      cleanupTodayPlan(deletedTask);
+
+      if (currentLevel === deletedTask) {
+        currentLevel = parentLevel;
+      }
+
+      pendingDeleteTask = null;
+      deleteModal.classList.remove('visible');
+      saveAppState();
+      renderCurrentLevel();
+      renderTodayTab();
+      renderQueue();
+      if (calendarWeekStart) renderCalendarWeek();
+      taskInput.focus();
+    });
+
+    function renderCurrentLevel() {
+      taskList.innerHTML = '';
+      taskList.append(emptyState);
+      getSortedTasks(currentLevel.children).forEach((task) => taskList.append(createTaskBlock(task)));
+
+      const routineDay = getRoutineDayDefinitionForLevel(currentLevel);
+      const isRoutineRoot = currentLevel.id === routineRootId;
+      const insideRoutineTask = Boolean(routineDay && !isRoutineDayStructureTask(currentLevel));
+      const canCreateHere = !isRoutineRoot && !insideRoutineTask;
+      taskForm.hidden = !canCreateHere;
+      taskInput.value = '';
+      taskInput.placeholder = routineDay && isRoutineDayStructureTask(currentLevel)
+        ? 'Digite a tarefa fixa deste dia'
+        : currentLevel.parent ? 'Digite um sub-bloco' : 'Digite uma tarefa';
+      renderBreadcrumb();
+      updateEmptyState();
+    }
+
+    taskForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const taskTitle = normalizeTaskTitle(taskInput.value);
+      if (!taskTitle) return;
+
+      const routineDay = getRoutineDayDefinitionForLevel(currentLevel);
+      if (currentLevel.id === routineRootId || (routineDay && !isRoutineDayStructureTask(currentLevel))) return;
+
+      const newTask = createTaskData(taskTitle, currentLevel);
+      if (routineDay && isRoutineDayStructureTask(currentLevel)) {
+        newTask.recurrence = 'weekly';
+      }
+      currentLevel.children.push(newTask);
+      if (currentLevel.parent && !isRoutineDayStructureTask(currentLevel)) clearSchedulingFromParentTask(currentLevel);
+
+      saveAppState();
+      renderCurrentLevel();
+      renderTodayTab();
+      renderQueue();
+      if (calendarWeekStart) renderCalendarWeek();
+
+      if (routineDay && isRoutineDayStructureTask(currentLevel)) {
+        openEditTaskModal(newTask);
+      } else {
+        taskInput.focus();
+      }
+    });
+
+
+
+    function getScheduledTasksForDate(dateValue, excludedTask = null) {
+      const normalizedDate = normalizePlannedDate(dateValue);
+      if (!normalizedDate) return [];
+      return getAllTasks().filter((task) =>
+        task !== excludedTask && !task.checked && !taskHasSubtasks(task) && getExecutionScheduledDate(task) === normalizedDate
+      );
+    }
+
+    function getDayAvailableMinutes(dateValue, excludedTask = null) {
+      const used = getScheduledTasksForDate(dateValue, excludedTask)
+        .reduce((total, task) => total + getTaskDurationMinutes(task), 0);
+      return Math.max(0, 1440 - Math.min(1440, used));
+    }
+
+    function getScheduleConflict(dateValue, startTime, endTime, excludedTask = null) {
+      const start = timeToMinutes(startTime);
+      const end = timeToMinutes(endTime);
+      if (start === null || end === null || end <= start) return null;
+      return getScheduledTasksForDate(dateValue, excludedTask).find((task) => {
+        const otherStart = timeToMinutes(task.startTime);
+        const otherEnd = timeToMinutes(task.endTime);
+        return otherStart !== null && otherEnd !== null && start < otherEnd && end > otherStart;
+      }) || null;
+    }
+
+    function canScheduleTaskOnDate(task, dateValue, startTime, endTime, showAlert = false) {
+      const normalizedDate = normalizePlannedDate(dateValue);
+      if (!normalizedDate) return true;
+      const start = timeToMinutes(startTime);
+      const end = timeToMinutes(endTime);
+      const duration = start !== null && end !== null && end > start
+        ? end - start
+        : getTaskDurationMinutes(task);
+      const available = getDayAvailableMinutes(normalizedDate, task);
+
+      if (duration > available) {
+        if (showAlert) {
+          window.alert(`Este dia não possui tempo disponível suficiente para esta tarefa. Tempo disponível: ${formatDurationMinutes(available)}.`);
+        }
+        return false;
+      }
+
+      const conflict = getScheduleConflict(normalizedDate, startTime, endTime, task);
+      if (conflict) {
+        if (showAlert) {
+          window.alert(`O horário escolhido conflita com “${getTaskDisplayTitle(conflict)}” (${conflict.startTime}–${conflict.endTime}). Tempo disponível no dia: ${formatDurationMinutes(available)}.`);
+        }
+        return false;
+      }
+      return true;
+    }
+
+    function updateEditTaskTimePreview() {
+      const hasDate = Boolean(normalizePlannedDate(editTaskDateInput.value));
+      editTaskTimeFields.hidden = !hasDate;
+      editTaskTimeSummary.hidden = !hasDate;
+      editTaskBlocksInput.disabled = !hasDate;
+      if (!hasDate) {
+        editTaskBlocksInput.value = '1';
+        return;
+      }
+      const adjusted = adjustTimeRangeToBlocks(editTaskStartTimeInput.value, editTaskEndTimeInput.value);
+      if (!adjusted) {
+        editTaskBlocksInput.value = String(normalizeBlocksRequired(editTargetTask?.blocksRequired));
+        editTaskTimeSummary.textContent = `Informe início e fim válidos. Os horários serão encaixados na grade de ${normalizeBlockDurationMinutes(blockDurationMinutes)} min.`;
+        return;
+      }
+      editTaskBlocksInput.value = String(adjusted.blocksRequired);
+      editTaskTimeSummary.textContent = adjusted.adjusted
+        ? `Ajuste pela grade de ${normalizeBlockDurationMinutes(blockDurationMinutes)} min: ${adjusted.startTime}–${adjusted.endTime} · ${adjusted.blocksRequired} bloco(s) · ${formatDurationMinutes(adjusted.durationMinutes)}.`
+        : `Horários alinhados à grade de ${normalizeBlockDurationMinutes(blockDurationMinutes)} min · ${adjusted.blocksRequired} bloco(s) · ${formatDurationMinutes(adjusted.durationMinutes)}.`;
+    }
+
+    function openEditTaskModal(task) {
+      if (!task || !task.parent || isRoutineStructureTask(task)) return;
+
+      editTargetTask = task;
+      editTaskNameInput.value = task.title || '';
+      editTaskBlocksInput.value = String(normalizeBlocksRequired(task.blocksRequired));
+
+      const hasSubtasks = taskHasSubtasks(task);
+      const routineDay = getRoutineDayDefinitionForTask(task);
+      const schedulingLocked = hasSubtasks;
+      const routineTask = Boolean(routineDay && !hasSubtasks);
+
+      Array.from(editTaskRecurrenceSelect.options).forEach((option) => {
+        const allowedForRoutine = ['weekly', 'biweekly'].includes(option.value);
+        option.hidden = routineTask && !allowedForRoutine;
+        option.disabled = routineTask && !allowedForRoutine;
+      });
+      editTaskRecurrenceSelect.value = routineTask
+        ? (task.recurrence === 'biweekly' ? 'biweekly' : 'weekly')
+        : (normalizeRecurrence(task.recurrence) || 'none');
+
+      editTaskRecurrenceLabel.hidden = schedulingLocked;
+      editTaskRecurrenceSelect.hidden = schedulingLocked;
+      editTaskDateLabel.hidden = schedulingLocked;
+      editTaskDateInput.hidden = schedulingLocked;
+      editTaskTimeFields.hidden = schedulingLocked;
+      editTaskTimeSummary.hidden = schedulingLocked;
+      editTaskBlocksInput.closest('div')?.removeAttribute('data-unused');
+
+      if (schedulingLocked) {
+        editTaskDateInput.value = '';
+        editTaskStartTimeInput.value = '';
+        editTaskEndTimeInput.value = '';
+        editTaskBlocksInput.value = '1';
+      } else {
+        editTaskDateInput.value = task.dueDate || (routineTask
+          ? getDateOnOrAfterForWeekday(formatDateValue(getTodayStart()), routineDay.weekday)
+          : '');
+        editTaskStartTimeInput.value = normalizeTime(task.startTime) || '';
+        editTaskEndTimeInput.value = normalizeTime(task.endTime) || '';
+        updateEditTaskTimePreview();
+      }
+
+      editTaskNameInput.readOnly = false;
+      editTaskModal.classList.add('visible');
+      editTaskNameInput.focus();
+      editTaskNameInput.select();
+    }
+
+    function closeEditTaskModal() {
+      editTaskModal.classList.remove('visible');
+      editTaskRecurrenceLabel.hidden = false;
+      editTaskRecurrenceSelect.hidden = false;
+      editTaskRecurrenceSelect.disabled = false;
+      Array.from(editTaskRecurrenceSelect.options).forEach((option) => { option.hidden = false; option.disabled = false; });
+      editTaskDateLabel.hidden = false;
+      editTaskDateInput.hidden = false;
+      editTaskTimeFields.hidden = false;
+      editTaskTimeSummary.hidden = false;
+      editTaskBlocksInput.disabled = false;
+      editTargetTask = null;
+      taskInput.focus();
+    }
+
+    cancelEditTaskButton.addEventListener('click', closeEditTaskModal);
+    editTaskDateInput.addEventListener('input', updateEditTaskTimePreview);
+    editTaskDateInput.addEventListener('change', updateEditTaskTimePreview);
+    editTaskStartTimeInput.addEventListener('input', updateEditTaskTimePreview);
+    editTaskEndTimeInput.addEventListener('input', updateEditTaskTimePreview);
+
+    editTaskModal.addEventListener('click', (event) => {
+      if (event.target === editTaskModal) {
+        closeEditTaskModal();
+      }
+    });
+
+    saveEditTaskButton.addEventListener('click', () => {
+      if (!editTargetTask) return;
+      const newTitle = normalizeTaskTitle(editTaskNameInput.value);
+      if (!newTitle) { editTaskNameInput.focus(); return; }
+
+      const hasSubtasks = taskHasSubtasks(editTargetTask);
+      const routineDay = getRoutineDayDefinitionForTask(editTargetTask);
+      let newDueDate = normalizePlannedDate(editTaskDateInput.value);
+      let adjustedRange = null;
+
+      if (!hasSubtasks && newDueDate) {
+        if (!normalizeTime(editTaskStartTimeInput.value) || !normalizeTime(editTaskEndTimeInput.value)) {
+          window.alert('Para agendar a tarefa, informe a hora de início e a hora de fim.');
+          return;
+        }
+        adjustedRange = adjustTimeRangeToBlocks(editTaskStartTimeInput.value, editTaskEndTimeInput.value);
+        if (!adjustedRange) {
+          window.alert('A hora fim deve ser posterior à hora início.');
+          return;
+        }
+        if (routineDay) {
+          newDueDate = getDateOnOrAfterForWeekday(newDueDate, routineDay.weekday);
+        }
+        if (!canScheduleTaskOnDate(editTargetTask, newDueDate, adjustedRange.startTime, adjustedRange.endTime, true)) return;
+      }
+
+      editTargetTask.title = newTitle;
+      if (hasSubtasks) {
+        clearSchedulingFromParentTask(editTargetTask);
+      } else if (newDueDate) {
+        editTargetTask.dueDate = newDueDate;
+        editTargetTask.plannedDate = newDueDate;
+        editTargetTask.startTime = adjustedRange.startTime;
+        editTargetTask.endTime = adjustedRange.endTime;
+        editTargetTask.blocksRequired = adjustedRange.blocksRequired;
+        editTargetTask.recurrence = routineDay
+          ? (editTaskRecurrenceSelect.value === 'biweekly' ? 'biweekly' : 'weekly')
+          : normalizeRecurrence(editTaskRecurrenceSelect.value);
+      } else {
+        editTargetTask.dueDate = null;
+        editTargetTask.plannedDate = null;
+        editTargetTask.startTime = null;
+        editTargetTask.endTime = null;
+        editTargetTask.blocksRequired = 1;
+        editTargetTask.recurrence = routineDay
+          ? (editTaskRecurrenceSelect.value === 'biweekly' ? 'biweekly' : 'weekly')
+          : normalizeRecurrence(editTaskRecurrenceSelect.value);
+      }
+
+      syncTodayPlanFromTaskPlans();
+      closeEditTaskModal();
+      saveAppState();
+      renderCurrentLevel();
+      renderTodayTab();
+      renderQueue();
+      if (calendarWeekStart) renderCalendarWeek();
+    });
+
+    editTaskNameInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        saveEditTaskButton.click();
+      }
+    });
+
+    function getDatedTasksSorted() {
+      return getAllTasks()
+        .filter((task) => task.dueDate && !taskHasSubtasks(task))
+        .sort((firstTask, secondTask) => {
+          const dateComparison = firstTask.dueDate.localeCompare(secondTask.dueDate);
+          if (dateComparison !== 0) return dateComparison;
+          const firstStart = timeToMinutes(firstTask.startTime);
+          const secondStart = timeToMinutes(secondTask.startTime);
+          if (firstStart !== null || secondStart !== null) {
+            if (firstStart === null) return 1;
+            if (secondStart === null) return -1;
+            if (firstStart !== secondStart) return firstStart - secondStart;
+          }
+          return getTaskPath(firstTask).localeCompare(getTaskPath(secondTask), 'pt-BR');
+        });
+    }
+
+    function getQueueTaskMeta(task) {
+      const details = [getTaskBlocksLabel(task), formatDurationMinutes(getTaskDurationMinutes(task))];
+      if (task.startTime && task.endTime) details.push(`${task.startTime}–${task.endTime}`);
+      if (task.recurrence) details.push(getRecurrenceLabel(task.recurrence));
+      if (task.checked) details.push('marcada');
+      return details.join(' · ');
+    }
+
+    function createQueueItem(task) {
+      const item = document.createElement('li');
+      item.className = 'queue-item queue-item-with-completion';
+
+      const dateBox = document.createElement('div');
+      dateBox.className = 'queue-date';
+
+      const dateLabel = document.createElement('span');
+      dateLabel.className = 'queue-date-label';
+      dateLabel.textContent = parseLocalDate(task.dueDate).toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+
+      const relativeLabel = document.createElement('span');
+      relativeLabel.className = 'queue-date-relative';
+      const daysClass = getDaysClass(task.dueDate);
+      if (daysClass) {
+        relativeLabel.classList.add(daysClass);
+      }
+      relativeLabel.textContent = getDaysLabel(task.dueDate);
+      dateBox.append(dateLabel, relativeLabel);
+
+      const main = document.createElement('div');
+      main.className = 'queue-main';
+
+      const title = document.createElement('span');
+      title.className = 'queue-title';
+      applyTaskNamePresentation(title, task);
+      main.append(title);
+
+      const parentPath = task.parent ? getTaskPath(task.parent) : '';
+      if (parentPath) {
+        const path = document.createElement('span');
+        path.className = 'queue-path';
+        path.textContent = parentPath;
+        main.append(path);
+      }
+
+      const meta = document.createElement('div');
+      meta.className = 'queue-meta';
+      meta.textContent = getQueueTaskMeta(task) || 'Com data';
+
+      item.classList.add('queue-item-clickable');
+      item.setAttribute('role', 'button');
+      item.setAttribute('tabindex', '0');
+      item.setAttribute('aria-label', `Editar ${getTaskDisplayTitle(task)}`);
+      item.title = 'Clique para editar a tarefa';
+
+      const openQueueTaskEditor = () => openEditTaskModal(task);
+      item.addEventListener('click', openQueueTaskEditor);
+      item.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openQueueTaskEditor();
+        }
+      });
+
+      const completionControl = createDueCheckbox(task);
+      completionControl.classList.add('queue-completion');
+      completionControl.title = `Concluir ${getTaskDisplayTitle(task)}`;
+
+      item.append(dateBox, main, meta, completionControl);
+      return item;
+    }
+
+    function createQueueSectionTitle(text) {
+      const item = document.createElement('li');
+      item.className = 'queue-section-title';
+      item.textContent = text;
+      return item;
+    }
+
+    function createQueueSectionDivider() {
+      const item = document.createElement('li');
+      item.setAttribute('aria-hidden', 'true');
+
+      const divider = document.createElement('hr');
+      divider.className = 'queue-section-divider';
+      item.append(divider);
+      return item;
+    }
+
+    function renderQueue() {
+      const tasks = getDatedTasksSorted();
+      queueList.innerHTML = '';
+
+      if (tasks.length === 0) {
+        const emptyState = document.createElement('li');
+        emptyState.className = 'queue-empty';
+        emptyState.textContent = 'Nenhuma tarefa com data definida.';
+        queueList.append(emptyState);
+        return;
+      }
+
+      const todayAndOverdueTasks = tasks.filter((task) => getDaysRemaining(task.dueDate) <= 0);
+      const futureTasks = tasks.filter((task) => getDaysRemaining(task.dueDate) > 0);
+
+      queueList.append(createQueueSectionTitle('Hoje'));
+      todayAndOverdueTasks.forEach((task) => {
+        queueList.append(createQueueItem(task));
+      });
+
+      queueList.append(createQueueSectionDivider());
+      queueList.append(createQueueSectionTitle('Tarefas futuras'));
+      futureTasks.forEach((task) => {
+        queueList.append(createQueueItem(task));
+      });
+    }
+
+    function getCalendarWeekStart(referenceDate = getTodayStart()) {
+      const date = new Date(referenceDate.getFullYear(), referenceDate.getMonth(), referenceDate.getDate());
+      const daysSinceSunday = date.getDay();
+      date.setDate(date.getDate() - daysSinceSunday);
+      return date;
+    }
+
+    function addCalendarDays(date, days) {
+      const nextDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      nextDate.setDate(nextDate.getDate() + days);
+      return nextDate;
+    }
+
+    function formatCalendarWeekLabel(weekStart) {
+      const weekEnd = addCalendarDays(weekStart, 6);
+      const startLabel = weekStart.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+      const endLabel = weekEnd.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+      return `${startLabel} – ${endLabel}`;
+    }
+
+    function getCalendarTaskMeta(task) {
+      const details = [getTaskBlocksLabel(task), formatDurationMinutes(getTaskDurationMinutes(task))];
+      if (task.startTime && task.endTime) details.unshift(`${task.startTime}–${task.endTime}`);
+      if (isRoutineRecurringTask(task)) {
+        details.push(`Rotina ${getRecurrenceLabel(task.recurrence).toLowerCase()}`);
+      } else if (task.recurrence) {
+        details.push(getRecurrenceLabel(task.recurrence));
+      }
+      return details.join(' · ');
+    }
+
+    const calendarInteractionModes = [
+      { id: 'edit', label: 'Editar' },
+      { id: 'complete', label: 'Concluir' },
+      { id: 'move', label: 'Mover' }
+    ];
+
+    function getCalendarInteractionModeDefinition() {
+      return calendarInteractionModes.find((mode) => mode.id === calendarInteractionMode)
+        || calendarInteractionModes[0];
+    }
+
+    function updateCalendarModeButton() {
+      if (!calendarModeButton) return;
+      const currentMode = getCalendarInteractionModeDefinition();
+      const currentIndex = calendarInteractionModes.findIndex((mode) => mode.id === currentMode.id);
+      const nextMode = calendarInteractionModes[(currentIndex + 1) % calendarInteractionModes.length];
+      calendarModeButton.dataset.mode = currentMode.id;
+      calendarModeButton.textContent = `Modo: ${currentMode.label}`;
+      calendarModeButton.setAttribute(
+        'aria-label',
+        `Modo atual: ${currentMode.label}. Clique para mudar para ${nextMode.label}.`
+      );
+      calendarModeButton.title = `Clique para mudar para ${nextMode.label}`;
+    }
+
+    function cycleCalendarInteractionMode() {
+      const currentIndex = calendarInteractionModes.findIndex((mode) => mode.id === calendarInteractionMode);
+      const nextIndex = currentIndex >= 0
+        ? (currentIndex + 1) % calendarInteractionModes.length
+        : 0;
+      calendarInteractionMode = calendarInteractionModes[nextIndex].id;
+      updateCalendarModeButton();
+      if (calendarWeekStart) renderCalendarWeek();
+    }
+
+    function createCalendarTaskItem(task, dateValue) {
+      const item = document.createElement('li');
+      const mode = getCalendarInteractionModeDefinition();
+      const isMoveMode = mode.id === 'move' && !isRoutineRecurringTask(task);
+
+      item.className = 'calendar-task';
+      item.dataset.calendarMode = mode.id;
+      item.dataset.taskId = task.id;
+      item.draggable = isMoveMode;
+
+      if (mode.id === 'edit') {
+        item.title = 'Clique para editar a tarefa';
+        item.setAttribute('aria-label', `Editar ${getTaskDisplayTitle(task)}`);
+        item.setAttribute('role', 'button');
+        item.setAttribute('tabindex', '0');
+      } else if (mode.id === 'complete') {
+        item.title = 'Clique para concluir a tarefa';
+        item.setAttribute('aria-label', `Concluir ${getTaskDisplayTitle(task)}`);
+        item.setAttribute('role', 'button');
+        item.setAttribute('tabindex', '0');
+      } else {
+        item.classList.add('planned-task-draggable');
+        item.title = isRoutineRecurringTask(task) ? 'Tarefas da ROTINA mantêm o dia da semana fixo' : 'Arraste a tarefa para outro dia';
+        item.setAttribute('aria-label', isRoutineRecurringTask(task) ? `${getTaskDisplayTitle(task)} possui dia fixo` : `Arrastar ${getTaskDisplayTitle(task)} para outro dia`);
+      }
+
+      const activateCalendarTask = () => {
+        if (calendarInteractionMode === 'edit') {
+          openEditTaskModal(task);
+        } else if (calendarInteractionMode === 'complete') {
+          openCompletionModal(task);
+        }
+      };
+
+      item.addEventListener('click', () => {
+        if (calendarInteractionMode !== 'move') {
+          activateCalendarTask();
+        }
+      });
+
+      item.addEventListener('keydown', (event) => {
+        if (calendarInteractionMode === 'move') return;
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          activateCalendarTask();
+        }
+      });
+
+      item.addEventListener('dragstart', (event) => {
+        if (calendarInteractionMode !== 'move') {
+          event.preventDefault();
+          return;
+        }
+
+        draggedPlannedTaskId = task.id;
+        item.classList.add('is-dragging');
+        if (event.dataTransfer) {
+          event.dataTransfer.effectAllowed = 'move';
+          event.dataTransfer.setData('text/plain', task.id);
+        }
+      });
+
+      item.addEventListener('dragend', () => {
+        draggedPlannedTaskId = null;
+        item.classList.remove('is-dragging');
+        clearPlanningDropTargets();
+      });
+
+      const head = document.createElement('div');
+      head.className = 'calendar-task-head';
+
+      const text = document.createElement('div');
+      text.className = 'calendar-task-text';
+
+      const title = document.createElement('span');
+      title.className = 'calendar-task-title';
+      applyTaskNamePresentation(title, task);
+      text.append(title);
+
+      const metaText = getCalendarTaskMeta(task);
+      if (metaText) {
+        const meta = document.createElement('span');
+        meta.className = 'calendar-task-meta';
+        meta.textContent = metaText;
+        text.append(meta);
+      }
+
+      head.append(text);
+      item.append(head);
+      return item;
+    }
+
+    function renderCalendarWeek() {
+      if (!calendarWeekStart) calendarWeekStart = getCalendarWeekStart();
+      updateCalendarModeButton();
+
+      const datedTasksChanged = syncDatedTasksToPlanning();
+      if (datedTasksChanged) saveAppState();
+
+      const todayValue = formatDateValue(getTodayStart());
+      calendarList.innerHTML = '';
+      calendarWeekLabel.textContent = formatCalendarWeekLabel(calendarWeekStart);
+
+      for (let dayIndex = 0; dayIndex < 7; dayIndex += 1) {
+        const date = addCalendarDays(calendarWeekStart, dayIndex);
+        const dateValue = formatDateValue(date);
+        const dayBlock = document.createElement('section');
+        dayBlock.className = 'calendar-day';
+        dayBlock.dataset.date = dateValue;
+        if (dateValue === todayValue) dayBlock.classList.add('is-today');
+
+        const weekdayTitle = document.createElement('strong');
+        weekdayTitle.className = 'calendar-weekday';
+        weekdayTitle.textContent = date.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
+        const dateTitle = document.createElement('span');
+        dateTitle.className = 'calendar-date';
+        dateTitle.textContent = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+
+        const dayTasks = getCalendarTasksForDate(dateValue);
+        const dayBlocks = dayTasks.reduce((total, task) => total + normalizeBlocksRequired(task.blocksRequired), 0);
+        const programmedMinutes = dayTasks.reduce((total, task) => total + getTaskDurationMinutes(task), 0);
+        const dayLoad = document.createElement('span');
+        dayLoad.className = 'calendar-day-load';
+        dayLoad.textContent = `${dayBlocks} bloco${dayBlocks === 1 ? '' : 's'} · ${formatDurationMinutes(programmedMinutes)} programado`;
+        dayBlock.append(weekdayTitle, dateTitle, dayLoad);
+
+        const list = document.createElement('ul');
+        list.className = 'calendar-day-queue';
+        if (dayTasks.length === 0) {
+          const empty = document.createElement('li');
+          empty.className = 'calendar-empty';
+          empty.textContent = 'Nenhuma tarefa agendada.';
+          list.append(empty);
+        } else {
+          let previousEnd = null;
+          dayTasks.forEach((task) => {
+            const start = timeToMinutes(task.startTime);
+            const end = timeToMinutes(task.endTime);
+            if (previousEnd !== null && start !== null && start > previousEnd) {
+              const gap = document.createElement('li');
+              gap.className = 'calendar-gap';
+              gap.textContent = `Livre ${minutesToTime(previousEnd)}–${minutesToTime(start)} · ${formatDurationMinutes(start - previousEnd)}`;
+              list.append(gap);
+            }
+            list.append(createCalendarTaskItem(task, dateValue));
+            if (end !== null) previousEnd = previousEnd === null ? end : Math.max(previousEnd, end);
+          });
+        }
+        dayBlock.append(list);
+        bindPlanningDropZone(dayBlock, dateValue);
+        calendarList.append(dayBlock);
+      }
+    }
+
+    function scrollCalendarToTodayOnMobile() {
+      if (!window.matchMedia('(max-width: 900px)').matches) return;
+      const todayCard = calendarList.querySelector('.calendar-day.is-today');
+      if (!todayCard) return;
+      calendarList.scrollTo({ left: todayCard.offsetLeft - calendarList.offsetLeft, behavior: 'auto' });
+      todayCard.scrollIntoView({ block: 'start', inline: 'start', behavior: 'auto' });
+    }
+
+    calendarModeButton.addEventListener('click', cycleCalendarInteractionMode);
+    updateCalendarModeButton();
+
+    calendarPreviousWeekButton.addEventListener('click', () => {
+      calendarWeekStart = addCalendarDays(calendarWeekStart || getCalendarWeekStart(), -7);
+      renderCalendarWeek();
+    });
+
+    calendarNextWeekButton.addEventListener('click', () => {
+      calendarWeekStart = addCalendarDays(calendarWeekStart || getCalendarWeekStart(), 7);
+      renderCalendarWeek();
+    });
+
+    function closeReportModal() {
+      reportModal.classList.remove('visible');
+      reportButton.focus();
+    }
+
+    reportButton.addEventListener('click', () => {
+      saveDailyReportSnapshot(lastKnownDate);
+      saveAppState();
+      renderReportTable();
+      reportModal.classList.add('visible');
+      closeReportButton.focus();
+    });
+
+    closeReportButton.addEventListener('click', closeReportModal);
+
+    reportModal.addEventListener('click', (event) => {
+      if (event.target === reportModal) {
+        closeReportModal();
+      }
+    });
+
+    function updateBlockDurationControls() {
+      const block = normalizeBlockDurationMinutes(blockDurationMinutes);
+      if (blockDurationMinutesInput) {
+        blockDurationMinutesInput.value = String(block);
+      }
+      if (blockDurationSummary) {
+        blockDurationSummary.textContent = `Cada bloco representa ${block} minuto(s).`;
+      }
+
+      // O step do input type=time é expresso em segundos. Assim, o próprio
+      // seletor de horário acompanha a grade configurada (5, 15, 30 min etc.).
+      const timeStepSeconds = String(block * 60);
+      editTaskStartTimeInput?.setAttribute('step', timeStepSeconds);
+      editTaskEndTimeInput?.setAttribute('step', timeStepSeconds);
+    }
+
+    saveBlockDurationButton?.addEventListener('click', () => {
+      blockDurationMinutes = normalizeBlockDurationMinutes(blockDurationMinutesInput.value);
+      recalculateTaskBlocksFromTimes();
+      updateBlockDurationControls();
+      saveAppState();
+      renderCurrentLevel();
+      renderTodayTab();
+      renderQueue();
+      if (calendarWeekStart) renderCalendarWeek();
+    });
+
+    blockDurationMinutesInput?.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        saveBlockDurationButton.click();
+      }
+    });
+
+    themeToggleButton.addEventListener('click', () => {
+      applyTheme(appTheme === 'dark' ? 'light' : 'dark');
+      saveAppState();
+    });
+
+    function closeClearDataModal() {
+      clearDataModal.classList.remove('visible');
+      clearDataButton.focus();
+    }
+
+    clearDataButton.addEventListener('click', () => {
+      clearDataModal.classList.add('visible');
+      confirmClearDataButton.focus();
+    });
+
+    exportDataButton.addEventListener('click', exportTasksCsv);
+
+    importDataButton.addEventListener('click', () => {
+      importDataInput.click();
+    });
+
+    importDataInput.addEventListener('change', () => {
+      const [file] = importDataInput.files;
+
+      if (!file) {
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.addEventListener('load', () => {
+        try {
+          importTasksFromCsv(String(reader.result || ''));
+        } catch (error) {
+          console.warn('Não foi possível importar o CSV.', error);
+          alert('Não foi possível importar este CSV.');
+        } finally {
+          importDataInput.value = '';
+        }
+      });
+
+      reader.readAsText(file, 'utf-8');
+    });
+
+    cancelClearDataButton.addEventListener('click', closeClearDataModal);
+
+    clearDataModal.addEventListener('click', (event) => {
+      if (event.target === clearDataModal) {
+        closeClearDataModal();
+      }
+    });
+
+    confirmClearDataButton.addEventListener('click', () => {
+      clearDataModal.classList.remove('visible');
+      resetAppState();
+      clearDataButton.focus();
+    });
+
+
+    function updateServerSyncStatus(message, state = 'idle') {
+      if (!serverSyncStatus) return;
+      serverSyncStatus.textContent = message;
+      serverSyncStatus.dataset.state = state;
+    }
+
+    function scheduleServerSave() {
+      clearTimeout(serverSaveTimer);
+      serverSaveTimer = setTimeout(() => {
+        saveStateToServer();
+      }, 450);
+    }
+
+    async function saveStateToServer(options = {}) {
+      if (serverSaveInFlight) {
+        serverSavePending = true;
+        return;
+      }
+
+      serverSaveInFlight = true;
+      clearTimeout(serverSaveTimer);
+      updateServerSyncStatus('Salvando...', 'syncing');
+
+      try {
+        const response = await fetch('/api/state', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+          },
+          body: JSON.stringify(getAppState()),
+          keepalive: Boolean(options.keepalive)
+        });
+
+        if (response.status === 401) {
+          window.location.replace('/login.html');
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error(`Falha ao salvar dados (${response.status}).`);
+        }
+
+        updateServerSyncStatus(
+          `Salvo às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}.`,
+          'connected'
+        );
+      } catch (error) {
+        console.warn('Não foi possível salvar os dados no servidor.', error);
+        updateServerSyncStatus('Falha ao salvar. Tentaremos novamente na próxima alteração.', 'error');
+      } finally {
+        serverSaveInFlight = false;
+
+        if (serverSavePending) {
+          serverSavePending = false;
+          scheduleServerSave();
+        }
+      }
+    }
+
+    logoutButton.addEventListener('click', async () => {
+      logoutButton.disabled = true;
+
+      try {
+        if (serverSaveTimer || serverSavePending) {
+          await saveStateToServer();
+        }
+
+        await fetch('/api/logout', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json'
+          }
+        });
+      } catch (error) {
+        console.warn('Falha ao encerrar a sessão.', error);
+      } finally {
+        window.location.replace('/login.html');
+      }
+    });
+
+    window.addEventListener('pagehide', () => {
+      if (serverSaveTimer || serverSavePending) {
+        saveStateToServer({ keepalive: true });
+      }
+    });
+
+    async function bootstrapApp() {
+      applyTheme(appTheme);
+      updateBlockDurationControls();
+      const loaded = await loadAppState();
+      if (!loaded) return;
+
+      const routineStructureChanged = ensureRoutineStructure();
+      if (routineStructureChanged) {
+        saveAppState();
+      }
+
+      refreshDateSensitiveViews();
+      syncTodayPlanFromTaskPlans();
+      renderCurrentLevel();
+      renderTodayTab();
+    }
+
+    bootstrapApp();
+  </script>
+</body>
+</html>
