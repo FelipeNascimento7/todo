@@ -7,19 +7,22 @@
   <style>
     :root {
       color-scheme: light;
-      --background: #f6f6f4;
+      --background: #f5f6f4;
       --surface: #ffffff;
-      --surface-muted: #f0f0ed;
-      --text: #171717;
-      --muted: #73716d;
-      --line: #e2e0db;
-      --accent: #111111;
-      --accent-soft: #eeeeea;
-      --danger: #b42318;
-      --danger-soft: #fff4f2;
-      --placeholder: #9a9791;
-      --nav-background: rgba(246, 246, 244, 0.92);
-      --modal-shade: rgba(23, 23, 23, 0.42);
+      --surface-muted: #eef0ed;
+      --text: #202420;
+      --muted: #697168;
+      --line: #dce2dc;
+      --accent: #37413a;
+      --accent-contrast: #ffffff;
+      --accent-soft: #e5eae6;
+      --danger: #b33b32;
+      --danger-contrast: #ffffff;
+      --danger-soft: #fbe9e7;
+      --placeholder: #8c958e;
+      --nav-background: rgba(245, 246, 244, 0.92);
+      --modal-shade: rgba(25, 31, 27, 0.42);
+      --shadow: 0 14px 38px rgba(31, 42, 34, 0.11);
       --radius: 16px;
       --tap-size: 44px;
       --content-width: 720px;
@@ -27,19 +30,204 @@
 
     :root[data-theme="dark"] {
       color-scheme: dark;
-      --background: #111111;
-      --surface: #171717;
-      --surface-muted: #24231f;
-      --text: #f6f6f4;
-      --muted: #e2e0db;
-      --line: #73716d;
-      --accent: #f6f6f4;
-      --accent-soft: #2f2e2a;
-      --danger: #ff766b;
-      --danger-soft: rgba(255, 118, 107, 0.14);
-      --placeholder: #aaa7a1;
-      --nav-background: rgba(17, 17, 17, 0.92);
+      --background: #141714;
+      --surface: #1b1f1b;
+      --surface-muted: #252a25;
+      --text: #f0f3ef;
+      --muted: #adb6ad;
+      --line: #343a34;
+      --accent: #dbe3dc;
+      --accent-contrast: #172019;
+      --accent-soft: #2a302a;
+      --danger: #ff8178;
+      --danger-contrast: #24100e;
+      --danger-soft: rgba(255, 129, 120, 0.14);
+      --placeholder: #8f988f;
+      --nav-background: rgba(20, 23, 20, 0.92);
       --modal-shade: rgba(0, 0, 0, 0.64);
+      --shadow: 0 16px 42px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Paletas neutras */
+    :root[data-palette="sand"] {
+      --background: #f8f5ef;
+      --surface: #fffdf9;
+      --surface-muted: #f1ebe1;
+      --text: #2b2721;
+      --muted: #756c60;
+      --line: #e5ddd0;
+      --accent: #765b3d;
+      --accent-contrast: #fffaf2;
+      --accent-soft: #eee3d4;
+      --placeholder: #9a8e7d;
+      --nav-background: rgba(248, 245, 239, 0.92);
+      --modal-shade: rgba(43, 34, 24, 0.42);
+      --shadow: 0 14px 38px rgba(78, 61, 40, 0.11);
+    }
+
+    :root[data-theme="dark"][data-palette="sand"] {
+      --background: #181511;
+      --surface: #211d18;
+      --surface-muted: #2b261f;
+      --text: #f4eee5;
+      --muted: #bdb1a1;
+      --line: #3d352b;
+      --accent: #d7b27a;
+      --accent-contrast: #21170d;
+      --accent-soft: #342b20;
+      --placeholder: #948878;
+      --nav-background: rgba(24, 21, 17, 0.92);
+    }
+
+    :root[data-palette="sage"] {
+      --background: #f3f6f2;
+      --surface: #fcfdfb;
+      --surface-muted: #e8eee7;
+      --text: #222b23;
+      --muted: #657066;
+      --line: #d7dfd6;
+      --accent: #55705a;
+      --accent-contrast: #ffffff;
+      --accent-soft: #dfe8df;
+      --placeholder: #879188;
+      --nav-background: rgba(243, 246, 242, 0.92);
+      --modal-shade: rgba(27, 42, 29, 0.4);
+      --shadow: 0 14px 38px rgba(58, 82, 61, 0.1);
+    }
+
+    :root[data-theme="dark"][data-palette="sage"] {
+      --background: #111713;
+      --surface: #182019;
+      --surface-muted: #222b23;
+      --text: #edf3ed;
+      --muted: #aab8ab;
+      --line: #344137;
+      --accent: #91c59b;
+      --accent-contrast: #102014;
+      --accent-soft: #29372c;
+      --placeholder: #859387;
+      --nav-background: rgba(17, 23, 19, 0.92);
+    }
+
+    /* Paletas vivas */
+    :root[data-palette="ocean"] {
+      --background: #f3f7fb;
+      --surface: #fbfdff;
+      --surface-muted: #e8f0f8;
+      --text: #182838;
+      --muted: #627287;
+      --line: #d6e2ee;
+      --accent: #176cae;
+      --accent-contrast: #ffffff;
+      --accent-soft: #dceeff;
+      --placeholder: #8494a6;
+      --nav-background: rgba(243, 247, 251, 0.92);
+      --modal-shade: rgba(16, 42, 65, 0.42);
+      --shadow: 0 14px 38px rgba(31, 82, 122, 0.12);
+    }
+
+    :root[data-theme="dark"][data-palette="ocean"] {
+      --background: #0d151d;
+      --surface: #131f2a;
+      --surface-muted: #1c2a37;
+      --text: #edf6fd;
+      --muted: #a9bdcd;
+      --line: #304355;
+      --accent: #67b9f5;
+      --accent-contrast: #082036;
+      --accent-soft: #1e3b52;
+      --placeholder: #8196a7;
+      --nav-background: rgba(13, 21, 29, 0.92);
+    }
+
+    :root[data-palette="emerald"] {
+      --background: #f2f8f5;
+      --surface: #fbfefc;
+      --surface-muted: #e4f1ea;
+      --text: #172a21;
+      --muted: #60766a;
+      --line: #d2e5da;
+      --accent: #16815a;
+      --accent-contrast: #ffffff;
+      --accent-soft: #d8f0e4;
+      --placeholder: #81978b;
+      --nav-background: rgba(242, 248, 245, 0.92);
+      --modal-shade: rgba(11, 50, 34, 0.42);
+      --shadow: 0 14px 38px rgba(25, 97, 69, 0.11);
+    }
+
+    :root[data-theme="dark"][data-palette="emerald"] {
+      --background: #0d1712;
+      --surface: #142019;
+      --surface-muted: #1e2c24;
+      --text: #edf8f2;
+      --muted: #a5bcaf;
+      --line: #304438;
+      --accent: #59d29d;
+      --accent-contrast: #092417;
+      --accent-soft: #1d4533;
+      --placeholder: #81988b;
+      --nav-background: rgba(13, 23, 18, 0.92);
+    }
+
+    :root[data-palette="violet"] {
+      --background: #f7f4fb;
+      --surface: #fefcff;
+      --surface-muted: #eee8f7;
+      --text: #2c2237;
+      --muted: #746781;
+      --line: #e1d8ec;
+      --accent: #7950c7;
+      --accent-contrast: #ffffff;
+      --accent-soft: #e8ddf7;
+      --placeholder: #9586a4;
+      --nav-background: rgba(247, 244, 251, 0.92);
+      --modal-shade: rgba(44, 28, 62, 0.42);
+      --shadow: 0 14px 38px rgba(91, 61, 130, 0.11);
+    }
+
+    :root[data-theme="dark"][data-palette="violet"] {
+      --background: #17121d;
+      --surface: #201828;
+      --surface-muted: #2b2235;
+      --text: #f6effc;
+      --muted: #c0afcf;
+      --line: #42334f;
+      --accent: #b994f3;
+      --accent-contrast: #24123b;
+      --accent-soft: #3a2850;
+      --placeholder: #9786a7;
+      --nav-background: rgba(23, 18, 29, 0.92);
+    }
+
+    :root[data-palette="coral"] {
+      --background: #fff6f3;
+      --surface: #fffdfc;
+      --surface-muted: #f9e9e4;
+      --text: #35231f;
+      --muted: #806b65;
+      --line: #eed9d2;
+      --accent: #cf5b3f;
+      --accent-contrast: #ffffff;
+      --accent-soft: #f8ddd5;
+      --placeholder: #a28b84;
+      --nav-background: rgba(255, 246, 243, 0.92);
+      --modal-shade: rgba(67, 33, 25, 0.42);
+      --shadow: 0 14px 38px rgba(145, 70, 51, 0.11);
+    }
+
+    :root[data-theme="dark"][data-palette="coral"] {
+      --background: #1b1210;
+      --surface: #251917;
+      --surface-muted: #32221e;
+      --text: #fff2ee;
+      --muted: #ceb0a8;
+      --line: #4b342e;
+      --accent: #ff957d;
+      --accent-contrast: #35150d;
+      --accent-soft: #513127;
+      --placeholder: #a78b83;
+      --nav-background: rgba(27, 18, 16, 0.92);
     }
 
     * {
@@ -123,7 +311,7 @@
 
     .tab-button.active {
       background: var(--accent);
-      color: var(--surface);
+      color: var(--accent-contrast);
     }
 
     .mobile-tab-current,
@@ -231,7 +419,7 @@
     .save-useful-time-button,
     .export-button {
       background: var(--accent);
-      color: var(--surface);
+      color: var(--accent-contrast);
       border-color: var(--accent);
     }
 
@@ -400,7 +588,7 @@
       padding: 4px 8px;
       border-radius: 999px;
       background: var(--accent);
-      color: var(--surface);
+      color: var(--accent-contrast);
       font-size: 0.82rem;
       font-weight: 800;
       white-space: nowrap;
@@ -940,7 +1128,7 @@
     .danger-button,
     .confirm-delete-button {
       background: var(--danger);
-      color: var(--surface);
+      color: var(--danger-contrast);
       border-color: var(--danger);
     }
 
@@ -1251,7 +1439,82 @@
     .execution-next-actions .primary {
       border-color: var(--accent);
       background: var(--accent);
-      color: var(--surface);
+      color: var(--accent-contrast);
+    }
+
+    .execution-picker-dialog {
+      width: min(560px, 100%);
+      max-height: min(78vh, 720px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .execution-picker-list {
+      display: grid;
+      gap: 10px;
+      margin: 0 0 18px;
+      padding: 0;
+      overflow-y: auto;
+      list-style: none;
+    }
+
+    .execution-picker-item {
+      display: grid;
+      gap: 8px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-muted);
+    }
+
+    .execution-picker-item.is-current {
+      border-color: var(--accent);
+    }
+
+    .execution-picker-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .execution-picker-title {
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.25;
+    }
+
+    .execution-picker-badge {
+      flex: 0 0 auto;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .execution-picker-badge.overdue {
+      color: var(--danger);
+    }
+
+    .execution-picker-path,
+    .execution-picker-meta,
+    .execution-picker-empty {
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .execution-picker-select {
+      justify-self: start;
+      min-height: var(--tap-size);
+      padding: 9px 12px;
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: var(--accent-contrast);
+      font-weight: 800;
+      cursor: pointer;
     }
 
     .consistency-ratio {
@@ -1285,6 +1548,155 @@
       margin-bottom: 10px;
     }
 
+    .settings-theme-field {
+      width: 100%;
+      margin-top: 16px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .settings-theme-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .settings-theme-heading h3 {
+      margin: 0 0 5px;
+      font-size: 1rem;
+    }
+
+    .settings-theme-heading p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .theme-mode-button {
+      flex: 0 0 auto;
+      min-height: 40px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface-muted);
+      color: var(--text);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .palette-section + .palette-section {
+      margin-top: 16px;
+    }
+
+    .palette-section-title {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 850;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .palette-option {
+      min-height: 72px;
+      display: grid;
+      align-content: center;
+      justify-items: start;
+      gap: 8px;
+      padding: 10px 11px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface-muted);
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+    }
+
+    .palette-option:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .palette-option[aria-pressed="true"] {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      box-shadow: inset 0 0 0 1px var(--accent);
+    }
+
+    .palette-option-name {
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .palette-swatches {
+      display: flex;
+      gap: 5px;
+    }
+
+    .palette-swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .palette-option[data-palette="graphite"] .palette-swatch:nth-child(1) { background: #37413a; }
+    .palette-option[data-palette="graphite"] .palette-swatch:nth-child(2) { background: #e5eae6; }
+    .palette-option[data-palette="graphite"] .palette-swatch:nth-child(3) { background: #f5f6f4; }
+    .palette-option[data-palette="sand"] .palette-swatch:nth-child(1) { background: #765b3d; }
+    .palette-option[data-palette="sand"] .palette-swatch:nth-child(2) { background: #eee3d4; }
+    .palette-option[data-palette="sand"] .palette-swatch:nth-child(3) { background: #f8f5ef; }
+    .palette-option[data-palette="sage"] .palette-swatch:nth-child(1) { background: #55705a; }
+    .palette-option[data-palette="sage"] .palette-swatch:nth-child(2) { background: #dfe8df; }
+    .palette-option[data-palette="sage"] .palette-swatch:nth-child(3) { background: #f3f6f2; }
+    .palette-option[data-palette="ocean"] .palette-swatch:nth-child(1) { background: #176cae; }
+    .palette-option[data-palette="ocean"] .palette-swatch:nth-child(2) { background: #dceeff; }
+    .palette-option[data-palette="ocean"] .palette-swatch:nth-child(3) { background: #f3f7fb; }
+    .palette-option[data-palette="emerald"] .palette-swatch:nth-child(1) { background: #16815a; }
+    .palette-option[data-palette="emerald"] .palette-swatch:nth-child(2) { background: #d8f0e4; }
+    .palette-option[data-palette="emerald"] .palette-swatch:nth-child(3) { background: #f2f8f5; }
+    .palette-option[data-palette="violet"] .palette-swatch:nth-child(1) { background: #7950c7; }
+    .palette-option[data-palette="violet"] .palette-swatch:nth-child(2) { background: #e8ddf7; }
+    .palette-option[data-palette="violet"] .palette-swatch:nth-child(3) { background: #f7f4fb; }
+    .palette-option[data-palette="coral"] .palette-swatch:nth-child(1) { background: #cf5b3f; }
+    .palette-option[data-palette="coral"] .palette-swatch:nth-child(2) { background: #f8ddd5; }
+    .palette-option[data-palette="coral"] .palette-swatch:nth-child(3) { background: #fff6f3; }
+
+    .edit-delete-button {
+      margin-right: auto;
+    }
+
+    .execution-picker-item.is-current .execution-picker-select {
+      background: var(--surface);
+      color: var(--accent);
+    }
+
+    @media (max-width: 560px) {
+      .settings-theme-heading {
+        display: grid;
+      }
+
+      .theme-mode-button {
+        width: 100%;
+      }
+
+      .palette-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
     .calendar-day-load {
       color: var(--muted);
       font-size: 0.72rem;
@@ -1300,7 +1712,7 @@
       border: 1px solid var(--line);
       border-radius: 16px;
       background: var(--surface);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+      box-shadow: var(--shadow);
     }
 
     .mobile-tab-menu.open {
@@ -1377,7 +1789,7 @@
         padding: 8px 16px;
         border-radius: 999px;
         background: var(--accent);
-        color: var(--surface);
+        color: var(--accent-contrast);
         font-size: 0.95rem;
         font-weight: 800;
         text-align: center;
@@ -1698,7 +2110,7 @@
     .consistency-dot.did-work {
       border-color: var(--accent);
       background: var(--accent);
-      color: var(--surface);
+      color: var(--accent-contrast);
     }
 
     .consistency-dot.is-today {
@@ -1899,7 +2311,7 @@
       border: 1px solid var(--accent);
       border-radius: var(--radius);
       background: var(--accent);
-      color: var(--surface);
+      color: var(--accent-contrast);
       font-weight: 850;
       cursor: pointer;
     }
@@ -2090,9 +2502,57 @@
           <input class="block-duration-input" id="block-duration-minutes" type="number" min="1" max="1440" step="1" inputmode="numeric" value="30">
           <button class="save-useful-time-button" id="save-block-duration" type="button">Salvar duração do bloco</button>
         </div>
+        <div class="settings-theme-field">
+          <div class="settings-theme-heading">
+            <div>
+              <h3>Tema de cores</h3>
+              <p>Escolha uma paleta confortável. O modo claro ou escuro é independente da cor.</p>
+            </div>
+            <button class="theme-mode-button" id="theme-toggle-button" type="button">Modo escuro</button>
+          </div>
+
+          <div class="palette-section">
+            <span class="palette-section-title">Neutras</span>
+            <div class="palette-grid">
+              <button class="palette-option" type="button" data-palette="graphite" aria-pressed="true">
+                <span class="palette-swatches" aria-hidden="true"><span class="palette-swatch"></span><span class="palette-swatch"></span><span class="palette-swatch"></span></span>
+                <span class="palette-option-name">Grafite</span>
+              </button>
+              <button class="palette-option" type="button" data-palette="sand" aria-pressed="false">
+                <span class="palette-swatches" aria-hidden="true"><span class="palette-swatch"></span><span class="palette-swatch"></span><span class="palette-swatch"></span></span>
+                <span class="palette-option-name">Areia</span>
+              </button>
+              <button class="palette-option" type="button" data-palette="sage" aria-pressed="false">
+                <span class="palette-swatches" aria-hidden="true"><span class="palette-swatch"></span><span class="palette-swatch"></span><span class="palette-swatch"></span></span>
+                <span class="palette-option-name">Sálvia</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="palette-section">
+            <span class="palette-section-title">Vivas</span>
+            <div class="palette-grid">
+              <button class="palette-option" type="button" data-palette="ocean" aria-pressed="false">
+                <span class="palette-swatches" aria-hidden="true"><span class="palette-swatch"></span><span class="palette-swatch"></span><span class="palette-swatch"></span></span>
+                <span class="palette-option-name">Oceano</span>
+              </button>
+              <button class="palette-option" type="button" data-palette="emerald" aria-pressed="false">
+                <span class="palette-swatches" aria-hidden="true"><span class="palette-swatch"></span><span class="palette-swatch"></span><span class="palette-swatch"></span></span>
+                <span class="palette-option-name">Esmeralda</span>
+              </button>
+              <button class="palette-option" type="button" data-palette="violet" aria-pressed="false">
+                <span class="palette-swatches" aria-hidden="true"><span class="palette-swatch"></span><span class="palette-swatch"></span><span class="palette-swatch"></span></span>
+                <span class="palette-option-name">Violeta</span>
+              </button>
+              <button class="palette-option" type="button" data-palette="coral" aria-pressed="false">
+                <span class="palette-swatches" aria-hidden="true"><span class="palette-swatch"></span><span class="palette-swatch"></span><span class="palette-swatch"></span></span>
+                <span class="palette-option-name">Coral</span>
+              </button>
+            </div>
+          </div>
+        </div>
         <div class="settings-actions">
           <button class="export-button" id="report-button" type="button">Relatório</button>
-          <button class="export-button" id="theme-toggle-button" type="button">Tema escuro</button>
           <span class="server-sync-status" id="server-sync-status" role="status" data-state="syncing">Carregando dados...</span>
           <button class="export-button" id="logout-button" type="button">Sair</button>
           <button class="export-button" id="export-data-button" type="button">Exportar dados CSV</button>
@@ -2102,6 +2562,17 @@
         </div>
       </section>
     </main>
+  </div>
+
+  <div class="modal-backdrop" id="execution-picker-modal" role="dialog" aria-modal="true" aria-labelledby="execution-picker-title">
+    <div class="confirm-dialog execution-picker-dialog">
+      <h2 id="execution-picker-title">Executar outra</h2>
+      <p>Escolha entre as tarefas atrasadas e as tarefas programadas para hoje qual será executada agora.</p>
+      <ul class="execution-picker-list" id="execution-picker-list" aria-label="Tarefas disponíveis para executar agora"></ul>
+      <div class="modal-actions">
+        <button class="cancel-button" id="close-execution-picker" type="button">Fechar</button>
+      </div>
+    </div>
   </div>
 
   <div class="modal-backdrop" id="completion-modal" role="dialog" aria-modal="true" aria-labelledby="completion-title">
@@ -2208,6 +2679,7 @@
       <input class="task-blocks-input" id="edit-task-blocks" type="number" min="1" max="999" step="1" inputmode="numeric" value="1" readonly aria-readonly="true">
 
       <div class="modal-actions">
+        <button class="danger-button edit-delete-button" id="delete-edit-task" type="button">Excluir</button>
         <button class="cancel-button" id="cancel-edit-task" type="button">Cancelar</button>
         <button class="save-name-button" id="save-edit-task" type="button">Salvar</button>
       </div>
@@ -2266,6 +2738,9 @@
     const deleteCurrentButton = document.querySelector('#delete-current-button');
     const executionNextTask = document.querySelector('#execution-next-task');
     const executionNextDate = document.querySelector('#execution-next-date');
+    const executionPickerModal = document.querySelector('#execution-picker-modal');
+    const executionPickerList = document.querySelector('#execution-picker-list');
+    const closeExecutionPickerButton = document.querySelector('#close-execution-picker');
     const calendarList = document.querySelector('#calendar-list');
     const calendarPreviousWeekButton = document.querySelector('#calendar-previous-week');
     const calendarNextWeekButton = document.querySelector('#calendar-next-week');
@@ -2283,6 +2758,7 @@
     const reportTableBody = document.querySelector('#report-table-body');
     const closeReportButton = document.querySelector('#close-report');
     const themeToggleButton = document.querySelector('#theme-toggle-button');
+    const themePaletteButtons = Array.from(document.querySelectorAll('.palette-option[data-palette]'));
     const logoutButton = document.querySelector('#logout-button');
     const serverSyncStatus = document.querySelector('#server-sync-status');
     const clearDataButton = document.querySelector('#clear-data-button');
@@ -2319,6 +2795,7 @@
     const saveBlockDurationButton = document.querySelector('#save-block-duration');
     const cancelEditTaskButton = document.querySelector('#cancel-edit-task');
     const saveEditTaskButton = document.querySelector('#save-edit-task');
+    const deleteEditTaskButton = document.querySelector('#delete-edit-task');
     const storageKey = 'todo-single-file-state';
     const rootLevel = {
       id: 'root',
@@ -2337,6 +2814,7 @@
     let todayPlan = [];
     let dailyReports = [];
     let appTheme = getSavedTheme();
+    let appPalette = getSavedPalette();
     let blockDurationMinutes = 30;
     let lastKnownDate = formatDateValue(getTodayStart());
     let isApplyingRemoteState = false;
@@ -2347,11 +2825,17 @@
     let calendarInteractionMode = 'edit';
     let editTargetTask = null;
     let executionState = {
-      dailyHistory: {}
+      dailyHistory: {},
+      currentTaskId: null
     };
 
     function normalizeTheme(value) {
       return value === 'dark' ? 'dark' : 'light';
+    }
+
+    function normalizePalette(value) {
+      const allowed = ['graphite', 'sand', 'sage', 'ocean', 'emerald', 'violet', 'coral'];
+      return allowed.includes(value) ? value : 'graphite';
     }
 
     function getSavedTheme() {
@@ -2362,9 +2846,23 @@
       }
     }
 
+    function getSavedPalette() {
+      try {
+        return normalizePalette(localStorage.getItem(`${storageKey}-palette`));
+      } catch (error) {
+        return 'graphite';
+      }
+    }
+
     function updateThemeToggleButton() {
-      themeToggleButton.textContent = appTheme === 'dark' ? 'Tema claro' : 'Tema escuro';
+      themeToggleButton.textContent = appTheme === 'dark' ? 'Usar modo claro' : 'Usar modo escuro';
       themeToggleButton.setAttribute('aria-pressed', String(appTheme === 'dark'));
+    }
+
+    function updatePaletteButtons() {
+      themePaletteButtons.forEach((button) => {
+        button.setAttribute('aria-pressed', String(button.dataset.palette === appPalette));
+      });
     }
 
     function applyTheme(theme) {
@@ -2376,6 +2874,17 @@
         // O tema continua aplicado mesmo se o armazenamento local estiver indisponível.
       }
       updateThemeToggleButton();
+    }
+
+    function applyPalette(palette) {
+      appPalette = normalizePalette(palette);
+      document.documentElement.dataset.palette = appPalette;
+      try {
+        localStorage.setItem(`${storageKey}-palette`, appPalette);
+      } catch (error) {
+        // A paleta continua aplicada mesmo se o armazenamento local estiver indisponível.
+      }
+      updatePaletteButtons();
     }
 
     function normalizeTaskTitle(value) {
@@ -2994,12 +3503,13 @@
 
     function getAppState() {
       return {
-        version: 8,
+        version: 10,
         updatedAt: new Date().toISOString(),
         tasks: rootLevel.children.map(serializeTask),
         todayPlanIds: todayPlan.map((task) => task.id),
         dailyReports,
         appTheme,
+        appPalette,
         settings: {
           blockDurationMinutes: normalizeBlockDurationMinutes(blockDurationMinutes)
         },
@@ -3029,6 +3539,7 @@
         ? safeState.dailyReports.map(normalizeDailyReport).filter(Boolean)
         : [];
       applyTheme(safeState.appTheme || safeState.theme || appTheme);
+      applyPalette(safeState.appPalette || safeState.palette || appPalette);
       blockDurationMinutes = normalizeBlockDurationMinutes(
         safeState.settings?.blockDurationMinutes ?? safeState.blockDurationMinutes ?? 30
       );
@@ -3391,6 +3902,7 @@
 
       pendingCompletionTask = task;
       pendingRoutineNextDate = null;
+
       completionActionInputs.forEach((input) => {
         input.checked = false;
       });
@@ -3440,6 +3952,7 @@
 
     function removeCompletedTask(task) {
       if (!task || !task.parent) return;
+      if (executionState.currentTaskId === task.id) executionState.currentTaskId = null;
       const parentLevel = task.parent;
       parentLevel.children = parentLevel.children.filter((child) => child !== task);
       cleanupTodayPlan(task);
@@ -3489,6 +4002,7 @@
         return false;
       }
 
+      if (executionState.currentTaskId === task.id) executionState.currentTaskId = null;
       cleanupTodayPlan();
       syncTodayPlanFromTaskPlans();
       return true;
@@ -3818,7 +4332,7 @@
       return normalizePlannedDate(task?.plannedDate) || normalizePlannedDate(task?.dueDate);
     }
 
-    function getNextExecutionTask() {
+    function getAutoNextExecutionTask() {
       return getAllTasks()
         .filter((task) => !task.checked && !taskHasSubtasks(task) && getExecutionScheduledDate(task))
         .sort((firstTask, secondTask) => {
@@ -3835,6 +4349,125 @@
           }
           return getTaskPath(firstTask).localeCompare(getTaskPath(secondTask), 'pt-BR');
         })[0] || null;
+    }
+
+    function isTaskAvailableForExecutionPicker(task) {
+      if (!task || task.checked || taskHasSubtasks(task)) return false;
+      const scheduledDate = getExecutionScheduledDate(task);
+      const todayValue = formatDateValue(getTodayStart());
+      return Boolean(scheduledDate && scheduledDate <= todayValue);
+    }
+
+    function getSelectedExecutionTask() {
+      if (!executionState.currentTaskId) return null;
+      const selectedTask = findTaskById(executionState.currentTaskId);
+      if (!isTaskAvailableForExecutionPicker(selectedTask)) {
+        executionState.currentTaskId = null;
+        return null;
+      }
+      return selectedTask;
+    }
+
+    function getNextExecutionTask() {
+      return getSelectedExecutionTask() || getAutoNextExecutionTask();
+    }
+
+    function getExecutionPickerTasks() {
+      return getAllTasks()
+        .filter(isTaskAvailableForExecutionPicker)
+        .sort((firstTask, secondTask) => {
+          const firstDate = getExecutionScheduledDate(firstTask);
+          const secondDate = getExecutionScheduledDate(secondTask);
+          const dateComparison = firstDate.localeCompare(secondDate);
+          if (dateComparison !== 0) return dateComparison;
+          const firstStart = timeToMinutes(firstTask.startTime);
+          const secondStart = timeToMinutes(secondTask.startTime);
+          if (firstStart === null && secondStart !== null) return 1;
+          if (firstStart !== null && secondStart === null) return -1;
+          if (firstStart !== null && secondStart !== null && firstStart !== secondStart) return firstStart - secondStart;
+          return getTaskPath(firstTask).localeCompare(getTaskPath(secondTask), 'pt-BR');
+        });
+    }
+
+    function closeExecutionPickerModal() {
+      executionPickerModal.classList.remove('visible');
+    }
+
+    closeExecutionPickerButton.addEventListener('click', closeExecutionPickerModal);
+    executionPickerModal.addEventListener('click', (event) => {
+      if (event.target === executionPickerModal) closeExecutionPickerModal();
+    });
+
+    function selectExecutionTask(task) {
+      if (!isTaskAvailableForExecutionPicker(task)) return;
+      executionState.currentTaskId = task.id;
+      closeExecutionPickerModal();
+      saveAppState();
+      renderTodayTab();
+    }
+
+    function openExecutionPickerModal() {
+      const tasks = getExecutionPickerTasks();
+      const todayValue = formatDateValue(getTodayStart());
+      const currentTask = getNextExecutionTask();
+      executionPickerList.innerHTML = '';
+
+      if (tasks.length === 0) {
+        const empty = document.createElement('li');
+        empty.className = 'execution-picker-empty';
+        empty.textContent = 'Não há tarefas atrasadas ou programadas para hoje.';
+        executionPickerList.append(empty);
+      } else {
+        tasks.forEach((task) => {
+          const scheduledDate = getExecutionScheduledDate(task);
+          const item = document.createElement('li');
+          item.className = 'execution-picker-item';
+          if (currentTask && currentTask.id === task.id) item.classList.add('is-current');
+
+          const heading = document.createElement('div');
+          heading.className = 'execution-picker-heading';
+
+          const title = document.createElement('h3');
+          title.className = 'execution-picker-title';
+          title.textContent = getTaskDisplayTitle(task);
+
+          const badge = document.createElement('span');
+          badge.className = 'execution-picker-badge';
+          if (scheduledDate < todayValue) badge.classList.add('overdue');
+          badge.textContent = scheduledDate < todayValue ? `Atrasada · ${formatReportDate(scheduledDate)}` : 'Hoje';
+          heading.append(title, badge);
+
+          const path = document.createElement('div');
+          path.className = 'execution-picker-path';
+          path.textContent = getTaskPath(task);
+
+          const meta = document.createElement('div');
+          meta.className = 'execution-picker-meta';
+          const metaParts = [getTaskBlocksLabel(task), formatDurationMinutes(getTaskDurationMinutes(task))];
+          if (task.startTime && task.endTime) metaParts.push(`${task.startTime}–${task.endTime}`);
+          meta.textContent = metaParts.join(' · ');
+
+          const selectButton = document.createElement('button');
+          selectButton.type = 'button';
+          selectButton.className = 'execution-picker-select';
+          const isCurrent = currentTask && currentTask.id === task.id;
+          selectButton.textContent = isCurrent ? 'Em foco' : 'Executar agora';
+          selectButton.setAttribute('aria-label', isCurrent ? 'Fechar e manter esta tarefa em foco' : `Executar agora: ${getTaskDisplayTitle(task)}`);
+          selectButton.addEventListener('click', () => {
+            if (isCurrent) {
+              closeExecutionPickerModal();
+              return;
+            }
+            selectExecutionTask(task);
+          });
+
+          item.append(heading, path, meta, selectButton);
+          executionPickerList.append(item);
+        });
+      }
+
+      executionPickerModal.classList.add('visible');
+      closeExecutionPickerButton.focus();
     }
 
     function getExecutionDateLabel(dateValue) {
@@ -3893,11 +4526,16 @@
       completeButton.textContent = 'Concluir tarefa';
       completeButton.addEventListener('click', () => openCompletionModal(task));
 
+      const switchButton = document.createElement('button');
+      switchButton.type = 'button';
+      switchButton.textContent = 'Executar outra';
+      switchButton.addEventListener('click', openExecutionPickerModal);
+
       const editButton = document.createElement('button');
       editButton.type = 'button';
       editButton.textContent = 'Editar';
       editButton.addEventListener('click', () => openEditTaskModal(task));
-      actions.append(completeButton, editButton);
+      actions.append(completeButton, switchButton, editButton);
 
       card.append(title, path, meta, actions);
       executionNextTask.append(card);
@@ -3949,7 +4587,8 @@
         : {};
 
       return {
-        dailyHistory: { ...dailyHistory }
+        dailyHistory: { ...dailyHistory },
+        currentTaskId: typeof safe.currentTaskId === 'string' ? safe.currentTaskId : null
       };
     }
 
@@ -4263,15 +4902,16 @@
       }
     });
 
-    deleteCurrentButton.addEventListener('click', () => {
-      if (!currentLevel.parent || isRoutineStructureTask(currentLevel)) {
-        return;
-      }
-
-      pendingDeleteTask = currentLevel;
-      deleteMessage.textContent = `Essa ação remove "${currentLevel.title}" e todas as subtarefas dentro dela.`;
+    function openDeleteTaskConfirmation(task) {
+      if (!task || !task.parent || isRoutineStructureTask(task)) return;
+      pendingDeleteTask = task;
+      deleteMessage.textContent = `Essa ação remove "${task.title}" e todas as subtarefas dentro dela.`;
       deleteModal.classList.add('visible');
       confirmDeleteButton.focus();
+    }
+
+    deleteCurrentButton.addEventListener('click', () => {
+      openDeleteTaskConfirmation(currentLevel);
     });
 
     confirmDeleteButton.addEventListener('click', () => {
@@ -4280,6 +4920,10 @@
       }
 
       const deletedTask = pendingDeleteTask;
+      const selectedExecutionTask = executionState.currentTaskId ? findTaskById(executionState.currentTaskId) : null;
+      if (selectedExecutionTask && isTaskInsideDeletedTask(selectedExecutionTask, deletedTask)) {
+        executionState.currentTaskId = null;
+      }
       const parentLevel = deletedTask.parent;
       parentLevel.children = parentLevel.children.filter((child) => child !== deletedTask);
       cleanupTodayPlan(deletedTask);
@@ -4484,6 +5128,12 @@
     }
 
     cancelEditTaskButton.addEventListener('click', closeEditTaskModal);
+    deleteEditTaskButton.addEventListener('click', () => {
+      if (!editTargetTask || isRoutineStructureTask(editTargetTask)) return;
+      const taskToDelete = editTargetTask;
+      closeEditTaskModal();
+      openDeleteTaskConfirmation(taskToDelete);
+    });
     editTaskDateInput.addEventListener('input', updateEditTaskTimePreview);
     editTaskDateInput.addEventListener('change', updateEditTaskTimePreview);
     editTaskStartTimeInput.addEventListener('input', updateEditTaskTimePreview);
@@ -4997,6 +5647,13 @@
       saveAppState();
     });
 
+    themePaletteButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        applyPalette(button.dataset.palette);
+        saveAppState();
+      });
+    });
+
     function closeClearDataModal() {
       clearDataModal.classList.remove('visible');
       clearDataButton.focus();
@@ -5139,6 +5796,7 @@
     });
 
     async function bootstrapApp() {
+      applyPalette(appPalette);
       applyTheme(appTheme);
       updateBlockDurationControls();
       const loaded = await loadAppState();
