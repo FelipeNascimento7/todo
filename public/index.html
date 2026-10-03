@@ -3346,11 +3346,37 @@
       return getAllTasks().filter((task) => !task.checked && task.plannedDate === dateValue);
     }
 
+    function doesRoutineTaskOccurOnDate(task, dateValue) {
+      const normalizedDate = normalizePlannedDate(dateValue);
+      const routineDay = getRoutineDayDefinitionForTask(task);
+      if (!normalizedDate || !routineDay || taskHasSubtasks(task)) return false;
+
+      const occurrenceDate = parseLocalDate(normalizedDate);
+      if (occurrenceDate.getDay() !== routineDay.weekday) return false;
+
+      const recurrence = task.recurrence === 'biweekly' ? 'biweekly' : 'weekly';
+      if (recurrence === 'weekly') return true;
+
+      // A data atualmente gravada na tarefa funciona como âncora da quinzena.
+      // Como cada conclusão quinzenal avança exatamente 14 dias, a paridade
+      // permanece estável mesmo após sucessivos reagendamentos.
+      const anchorValue = getExecutionScheduledDate(task)
+        || getDateOnOrAfterForWeekday(formatDateValue(getTodayStart()), routineDay.weekday);
+      const anchorDate = parseLocalDate(anchorValue);
+      const millisecondsPerDay = 24 * 60 * 60 * 1000;
+      const differenceInDays = Math.round((occurrenceDate - anchorDate) / millisecondsPerDay);
+      return Math.abs(differenceInDays) % 14 === 0;
+    }
+
     function getCalendarTasksForDate(dateValue) {
       const normalizedDate = normalizePlannedDate(dateValue);
       if (!normalizedDate) return [];
       return getAllTasks()
-        .filter((task) => !task.checked && !taskHasSubtasks(task) && getExecutionScheduledDate(task) === normalizedDate)
+        .filter((task) => {
+          if (task.checked || taskHasSubtasks(task)) return false;
+          if (isRoutineRecurringTask(task)) return doesRoutineTaskOccurOnDate(task, normalizedDate);
+          return getExecutionScheduledDate(task) === normalizedDate;
+        })
         .sort((firstTask, secondTask) => {
           const firstStart = timeToMinutes(firstTask.startTime);
           const secondStart = timeToMinutes(secondTask.startTime);
@@ -4993,9 +5019,11 @@
     function getScheduledTasksForDate(dateValue, excludedTask = null) {
       const normalizedDate = normalizePlannedDate(dateValue);
       if (!normalizedDate) return [];
-      return getAllTasks().filter((task) =>
-        task !== excludedTask && !task.checked && !taskHasSubtasks(task) && getExecutionScheduledDate(task) === normalizedDate
-      );
+      return getAllTasks().filter((task) => {
+        if (task === excludedTask || task.checked || taskHasSubtasks(task)) return false;
+        if (isRoutineRecurringTask(task)) return doesRoutineTaskOccurOnDate(task, normalizedDate);
+        return getExecutionScheduledDate(task) === normalizedDate;
+      });
     }
 
     function getDayAvailableMinutes(dateValue, excludedTask = null) {
@@ -5025,6 +5053,14 @@
         : getTaskDurationMinutes(task);
       const available = getDayAvailableMinutes(normalizedDate, task);
 
+      const conflict = getScheduleConflict(normalizedDate, startTime, endTime, task);
+      if (conflict) {
+        if (showAlert) {
+          window.alert(`Não é permitido sobrepor tarefas. O horário escolhido conflita com “${getTaskDisplayTitle(conflict)}” (${conflict.startTime}–${conflict.endTime}). Tempo disponível no dia: ${formatDurationMinutes(available)}.`);
+        }
+        return false;
+      }
+
       if (duration > available) {
         if (showAlert) {
           window.alert(`Este dia não possui tempo disponível suficiente para esta tarefa. Tempo disponível: ${formatDurationMinutes(available)}.`);
@@ -5032,13 +5068,6 @@
         return false;
       }
 
-      const conflict = getScheduleConflict(normalizedDate, startTime, endTime, task);
-      if (conflict) {
-        if (showAlert) {
-          window.alert(`O horário escolhido conflita com “${getTaskDisplayTitle(conflict)}” (${conflict.startTime}–${conflict.endTime}). Tempo disponível no dia: ${formatDurationMinutes(available)}.`);
-        }
-        return false;
-      }
       return true;
     }
 
@@ -5442,6 +5471,13 @@
         if (calendarInteractionMode === 'edit') {
           openEditTaskModal(task);
         } else if (calendarInteractionMode === 'complete') {
+          if (isRoutineRecurringTask(task) && getExecutionScheduledDate(task) !== dateValue) {
+            const activeDate = getExecutionScheduledDate(task);
+            window.alert(activeDate
+              ? `Esta é uma ocorrência projetada da ROTINA. A ocorrência atualmente ativa está agendada para ${formatReportDate(activeDate)}.`
+              : 'Esta é uma ocorrência projetada da ROTINA e ainda não possui uma ocorrência ativa para conclusão.');
+            return;
+          }
           openCompletionModal(task);
         }
       };

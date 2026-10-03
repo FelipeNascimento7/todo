@@ -149,6 +149,7 @@ Esta versão inclui:
 - recorrências diária, semanal, quinzenal e mensal para tarefas comuns;
 - estrutura nativa **ROTINA → DIA DA SEMANA → tarefa**, com os dois primeiros níveis protegidos;
 - tarefas da ROTINA com recorrência semanal ou quinzenal e reagendamento automático após a conclusão;
+- projeção das tarefas da ROTINA na aba **Semana** em todas as semanas correspondentes à recorrência, mantendo o dia fixo e contabilizando o horário como ocupado;
 - navegação mobile por menu de abas no rodapé, com o nome da aba centralizado.
 
 Tarefas salvas por versões anteriores continuam compatíveis com o estado atual.
