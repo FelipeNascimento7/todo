@@ -230,6 +230,29 @@
       --nav-background: rgba(27, 18, 16, 0.92);
     }
 
+
+    /* Paleta profundamente escura: permanece escura nos dois modos. */
+    :root[data-palette="deepdark"],
+    :root[data-theme="dark"][data-palette="deepdark"] {
+      color-scheme: dark;
+      --background: #050607;
+      --surface: #0b0d0f;
+      --surface-muted: #121519;
+      --text: #f5f7fa;
+      --muted: #9ba3ad;
+      --line: #242a31;
+      --accent: #dfe5ec;
+      --accent-contrast: #090b0d;
+      --accent-soft: #1a1f25;
+      --danger: #ff766f;
+      --danger-contrast: #260b09;
+      --danger-soft: rgba(255, 118, 111, 0.13);
+      --placeholder: #737d88;
+      --nav-background: rgba(5, 6, 7, 0.94);
+      --modal-shade: rgba(0, 0, 0, 0.82);
+      --shadow: 0 18px 48px rgba(0, 0, 0, 0.48);
+    }
+
     * {
       box-sizing: border-box;
     }
@@ -1673,6 +1696,137 @@
     .palette-option[data-palette="coral"] .palette-swatch:nth-child(1) { background: #cf5b3f; }
     .palette-option[data-palette="coral"] .palette-swatch:nth-child(2) { background: #f8ddd5; }
     .palette-option[data-palette="coral"] .palette-swatch:nth-child(3) { background: #fff6f3; }
+    .palette-option[data-palette="deepdark"] .palette-swatch:nth-child(1) { background: #050607; }
+    .palette-option[data-palette="deepdark"] .palette-swatch:nth-child(2) { background: #121519; }
+    .palette-option[data-palette="deepdark"] .palette-swatch:nth-child(3) { background: #dfe5ec; }
+
+    .view-queue-button {
+      display: none;
+      min-height: 38px;
+      padding: 8px 12px;
+      border: 1px solid var(--accent);
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 850;
+      cursor: pointer;
+    }
+
+    .view-queue-button.visible {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .view-queue-button:hover { opacity: 0.88; }
+
+    .secondary-screen {
+      width: min(1180px, calc(100vw - 40px));
+      max-width: none;
+      margin-left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .secondary-screen-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .secondary-screen-header h1 { margin: 0 0 6px; }
+    .secondary-screen-header p { margin: 0; }
+
+    .report-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin: 18px 0;
+    }
+
+    .report-summary-card {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .report-summary-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .report-summary-card strong {
+      display: block;
+      margin-top: 5px;
+      color: var(--text);
+      font-size: 1.35rem;
+    }
+
+    .report-days-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .report-day-card {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .report-day-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .report-day-head strong { font-size: 1rem; }
+    .report-constancy { color: var(--accent); font-weight: 900; white-space: nowrap; }
+
+    .report-completed-list {
+      display: grid;
+      gap: 8px;
+      margin: 12px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .report-completed-task {
+      display: grid;
+      gap: 2px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface-muted);
+    }
+
+    .report-completed-task strong { overflow-wrap: anywhere; }
+    .report-completed-task span { color: var(--muted); font-size: 0.8rem; overflow-wrap: anywhere; }
+
+    .subtask-queue-context {
+      margin: 0 0 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-muted);
+      color: var(--muted);
+    }
+
+    .unscheduled-time-label {
+      color: var(--muted);
+      font-weight: 800;
+    }
+
 
     .edit-delete-button {
       margin-right: auto;
@@ -2373,6 +2527,38 @@
       height: 22px;
     }
 
+    /* Ajustes específicos para navegadores móveis WebKit/Safari (iPhone). */
+    @supports (-webkit-touch-callout: none) {
+      html, body { min-height: -webkit-fill-available; }
+      body { width: 100%; overflow-x: hidden; }
+      .app { min-height: -webkit-fill-available; }
+      .top-tabs {
+        -webkit-backdrop-filter: blur(18px);
+        backdrop-filter: blur(18px);
+        transform: translateZ(0);
+      }
+      .modal-backdrop { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+      .confirm-dialog { max-height: calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); overflow-y: auto; -webkit-overflow-scrolling: touch; }
+      input, select, textarea, button { font-size: 16px; }
+      input[type="date"], input[type="time"] { min-width: 0; max-width: 100%; }
+      #calendario .calendar-list { -webkit-overflow-scrolling: touch; }
+    }
+
+    @media (max-width: 560px) {
+      main {
+        padding-left: max(16px, env(safe-area-inset-left));
+        padding-right: max(16px, env(safe-area-inset-right));
+      }
+      .secondary-screen {
+        width: calc(100vw - max(32px, calc(env(safe-area-inset-left) + env(safe-area-inset-right) + 16px)));
+      }
+      .secondary-screen-header { display: grid; }
+      .secondary-screen-header .calendar-nav-button { width: 100%; }
+      .report-summary-grid { grid-template-columns: 1fr; }
+      .task-time-grid { grid-template-columns: 1fr; }
+      .report-day-head { align-items: flex-start; }
+    }
+
     @media (max-width: 620px) {
       .calendar-mode-row,
       .calendar-mode-button {
@@ -2432,6 +2618,7 @@
         <div class="planning-toolbar">
           <div class="breadcrumb" id="breadcrumb" aria-label="Caminho atual"></div>
           <div class="toolbar-actions">
+            <button class="view-queue-button" id="view-subtask-queue-button" type="button">Ver fila</button>
             <button class="delete-current-button" id="delete-current-button" type="button">Apagar</button>
           </div>
         </div>
@@ -2494,6 +2681,31 @@
         </ul>
       </section>
 
+
+      <section class="tab-panel secondary-screen" id="subtask-queue" aria-labelledby="subtask-queue-title">
+        <div class="secondary-screen-header">
+          <div>
+            <h1 id="subtask-queue-title">Fila de subtarefas</h1>
+            <p>Subtarefas ordenadas pelo agendamento mais recente primeiro.</p>
+          </div>
+          <button class="calendar-nav-button" id="close-subtask-queue" type="button">Voltar ao planejamento</button>
+        </div>
+        <div class="subtask-queue-context" id="subtask-queue-context"></div>
+        <ul class="queue-list" id="subtask-queue-list" aria-label="Fila das subtarefas"></ul>
+      </section>
+
+      <section class="tab-panel secondary-screen" id="relatorio" aria-labelledby="report-title">
+        <div class="secondary-screen-header">
+          <div>
+            <h1 id="report-title">Relatório</h1>
+            <p>Tarefas concluídas e constância registrada por dia.</p>
+          </div>
+          <button class="calendar-nav-button" id="close-report" type="button">Voltar às configurações</button>
+        </div>
+        <div class="report-summary-grid" id="report-summary-grid" aria-label="Resumo do relatório"></div>
+        <div class="report-days-list" id="report-days-list" aria-label="Relatório de tarefas concluídas por dia"></div>
+      </section>
+
       <section class="tab-panel" id="configuracoes" aria-labelledby="tab-configuracoes">
         <p>Ajuste preferências do app para deixar o fluxo do seu jeito.</p>
         <div class="settings-block-field">
@@ -2525,6 +2737,10 @@
               <button class="palette-option" type="button" data-palette="sage" aria-pressed="false">
                 <span class="palette-swatches" aria-hidden="true"><span class="palette-swatch"></span><span class="palette-swatch"></span><span class="palette-swatch"></span></span>
                 <span class="palette-option-name">Sálvia</span>
+              </button>
+              <button class="palette-option" type="button" data-palette="deepdark" aria-pressed="false">
+                <span class="palette-swatches" aria-hidden="true"><span class="palette-swatch"></span><span class="palette-swatch"></span><span class="palette-swatch"></span></span>
+                <span class="palette-option-name">Deep Dark</span>
               </button>
             </div>
           </div>
@@ -2558,6 +2774,7 @@
           <button class="export-button" id="export-data-button" type="button">Exportar dados CSV</button>
           <button class="export-button" id="import-data-button" type="button">Importar dados CSV</button>
           <input id="import-data-input" type="file" accept=".csv,text/csv" hidden>
+          <button class="danger-button" id="clear-completed-button" type="button">Apagar tarefas concluídas</button>
           <button class="danger-button" id="clear-data-button" type="button">Apagar dados</button>
         </div>
       </section>
@@ -2676,7 +2893,7 @@
       <p class="task-time-help" id="edit-task-time-summary">Ao salvar, início e fim são ajustados para a grade de minutos definida pelo tamanho do bloco.</p>
 
       <label class="task-field-label" for="edit-task-blocks">Blocos necessários</label>
-      <input class="task-blocks-input" id="edit-task-blocks" type="number" min="1" max="999" step="1" inputmode="numeric" value="1" readonly aria-readonly="true">
+      <input class="task-blocks-input" id="edit-task-blocks" type="number" min="1" max="999" step="1" inputmode="numeric" value="1">
 
       <div class="modal-actions">
         <button class="danger-button edit-delete-button" id="delete-edit-task" type="button">Excluir</button>
@@ -2686,28 +2903,13 @@
     </div>
   </div>
 
-  <div class="modal-backdrop" id="report-modal" role="dialog" aria-modal="true" aria-labelledby="report-title">
-    <div class="confirm-dialog report-dialog">
-      <h2 id="report-title">Relatório</h2>
-      <p>Acompanhe a conclusão diária com base na quantidade de tarefas planejadas e concluídas.</p>
-      <div class="report-table-wrap">
-        <table class="report-table" aria-label="Relatório diário">
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Tarefas</th>
-              <th>Conclusão</th>
-            </tr>
-          </thead>
-          <tbody id="report-table-body">
-            <tr>
-              <td class="report-empty" colspan="3">Nenhum dia com tarefas planejadas ainda.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+  <div class="modal-backdrop" id="clear-completed-modal" role="dialog" aria-modal="true" aria-labelledby="clear-completed-title">
+    <div class="confirm-dialog">
+      <h2 id="clear-completed-title">Apagar tarefas concluídas?</h2>
+      <p>Remove o histórico nominal das tarefas concluídas e qualquer tarefa ainda marcada como concluída. Os valores de constância já registrados serão mantidos.</p>
       <div class="modal-actions">
-        <button class="cancel-button" id="close-report" type="button">Fechar</button>
+        <button class="cancel-button" id="cancel-clear-completed" type="button">Cancelar</button>
+        <button class="confirm-delete-button" id="confirm-clear-completed" type="button">Apagar concluídas</button>
       </div>
     </div>
   </div>
@@ -2736,6 +2938,12 @@
     const emptyState = document.querySelector('#empty-state');
     const breadcrumb = document.querySelector('#breadcrumb');
     const deleteCurrentButton = document.querySelector('#delete-current-button');
+    const viewSubtaskQueueButton = document.querySelector('#view-subtask-queue-button');
+    const subtaskQueuePanel = document.querySelector('#subtask-queue');
+    const subtaskQueueTitle = document.querySelector('#subtask-queue-title');
+    const subtaskQueueContext = document.querySelector('#subtask-queue-context');
+    const subtaskQueueList = document.querySelector('#subtask-queue-list');
+    const closeSubtaskQueueButton = document.querySelector('#close-subtask-queue');
     const executionNextTask = document.querySelector('#execution-next-task');
     const executionNextDate = document.querySelector('#execution-next-date');
     const executionPickerModal = document.querySelector('#execution-picker-modal');
@@ -2754,13 +2962,18 @@
     const importDataButton = document.querySelector('#import-data-button');
     const importDataInput = document.querySelector('#import-data-input');
     const reportButton = document.querySelector('#report-button');
-    const reportModal = document.querySelector('#report-modal');
-    const reportTableBody = document.querySelector('#report-table-body');
+    const reportPanel = document.querySelector('#relatorio');
+    const reportSummaryGrid = document.querySelector('#report-summary-grid');
+    const reportDaysList = document.querySelector('#report-days-list');
     const closeReportButton = document.querySelector('#close-report');
     const themeToggleButton = document.querySelector('#theme-toggle-button');
     const themePaletteButtons = Array.from(document.querySelectorAll('.palette-option[data-palette]'));
     const logoutButton = document.querySelector('#logout-button');
     const serverSyncStatus = document.querySelector('#server-sync-status');
+    const clearCompletedButton = document.querySelector('#clear-completed-button');
+    const clearCompletedModal = document.querySelector('#clear-completed-modal');
+    const cancelClearCompletedButton = document.querySelector('#cancel-clear-completed');
+    const confirmClearCompletedButton = document.querySelector('#confirm-clear-completed');
     const clearDataButton = document.querySelector('#clear-data-button');
     const clearDataModal = document.querySelector('#clear-data-modal');
     const cancelClearDataButton = document.querySelector('#cancel-clear-data');
@@ -2824,9 +3037,11 @@
     let calendarWeekStart = null;
     let calendarInteractionMode = 'edit';
     let editTargetTask = null;
+    let subtaskQueueSourceTaskId = null;
     let executionState = {
       dailyHistory: {},
-      currentTaskId: null
+      currentTaskId: null,
+      completedTasks: []
     };
 
     function normalizeTheme(value) {
@@ -2834,7 +3049,7 @@
     }
 
     function normalizePalette(value) {
-      const allowed = ['graphite', 'sand', 'sage', 'ocean', 'emerald', 'violet', 'coral'];
+      const allowed = ['graphite', 'sand', 'sage', 'deepdark', 'ocean', 'emerald', 'violet', 'coral'];
       return allowed.includes(value) ? value : 'graphite';
     }
 
@@ -3529,7 +3744,7 @@
 
     function getAppState() {
       return {
-        version: 10,
+        version: 11,
         updatedAt: new Date().toISOString(),
         tasks: rootLevel.children.map(serializeTask),
         todayPlanIds: todayPlan.map((task) => task.id),
@@ -3625,6 +3840,7 @@
       blockDurationMinutes = 30;
       updateBlockDurationControls();
       executionState = normalizeExecutionState(null);
+      subtaskQueueSourceTaskId = null;
       nextTaskId = 1;
       lastKnownDate = formatDateValue(getTodayStart());
       ensureRoutineStructure();
@@ -3640,7 +3856,9 @@
       planejamento: 'Planejamento',
       calendario: 'Semana',
       fila: 'Fila',
-      configuracoes: 'Configurações'
+      configuracoes: 'Configurações',
+      relatorio: 'Relatório',
+      'subtask-queue': 'Fila de subtarefas'
     };
 
     function closeMobileTabMenu() {
@@ -3682,6 +3900,14 @@
 
       if (selectedTab === 'fila') {
         renderQueue();
+      }
+
+      if (selectedTab === 'relatorio') {
+        renderReportScreen();
+      }
+
+      if (selectedTab === 'subtask-queue') {
+        renderSubtaskQueueScreen();
       }
 
       updateMobileTabNavigation(selectedTab);
@@ -3988,13 +4214,39 @@
       }
     }
 
+    function recordCompletedTaskSnapshot(task) {
+      if (!task || !task.parent) return;
+      const completedDate = formatDateValue(getTodayStart());
+      const snapshot = normalizeCompletedTaskSnapshot({
+        id: `completed-${Date.now()}-${task.id}`,
+        sourceTaskId: task.id,
+        title: getTaskDisplayTitle(task),
+        path: getTaskPath(task),
+        completedDate,
+        scheduledDate: getExecutionScheduledDate(task),
+        startTime: task.startTime,
+        endTime: task.endTime,
+        blocksRequired: task.blocksRequired,
+        durationMinutes: getTaskDurationMinutes(task),
+        recurrence: task.recurrence,
+        completedAt: new Date().toISOString()
+      });
+      if (!snapshot) return;
+      executionState.completedTasks = Array.isArray(executionState.completedTasks) ? executionState.completedTasks : [];
+      executionState.completedTasks.unshift(snapshot);
+      executionState.completedTasks = executionState.completedTasks.slice(0, 5000);
+    }
+
     function finalizeTaskCompletion(task, action, newDate = null) {
       if (!task || !task.parent) return false;
 
       const wasAlreadyCompleted = Boolean(task.checked);
       const isPostponing = action === 'postpone';
       rememberDailyPlannedCount(formatDateValue(getTodayStart()));
-      if (!wasAlreadyCompleted && !isPostponing) recordDailyCompletion();
+      if (!wasAlreadyCompleted && !isPostponing) {
+        recordCompletedTaskSnapshot(task);
+        recordDailyCompletion();
+      }
 
       if (action === 'delete') {
         removeCompletedTask(task);
@@ -4096,6 +4348,8 @@
       renderTodayTab();
       renderQueue();
       if (calendarWeekStart) renderCalendarWeek();
+      if (subtaskQueuePanel.classList.contains('active')) renderSubtaskQueueScreen();
+      if (reportPanel.classList.contains('active')) renderReportScreen();
     });
 
 
@@ -4323,34 +4577,85 @@
         .sort((firstReport, secondReport) => secondReport.date.localeCompare(firstReport.date));
     }
 
-    function renderReportTable() {
-      const reportRows = getReportRows();
-      reportTableBody.innerHTML = '';
+    function getCompletedTasksForReportDate(dateValue) {
+      return (executionState.completedTasks || [])
+        .filter((task) => task.completedDate === dateValue)
+        .sort((first, second) => String(second.completedAt || '').localeCompare(String(first.completedAt || '')));
+    }
 
-      if (reportRows.length === 0) {
-        const emptyRow = document.createElement('tr');
-        const emptyCell = document.createElement('td');
-        emptyCell.className = 'report-empty';
-        emptyCell.colSpan = 3;
-        emptyCell.textContent = 'Nenhum dia com tarefas planejadas ainda.';
-        emptyRow.append(emptyCell);
-        reportTableBody.append(emptyRow);
+    function renderReportScreen() {
+      saveDailyReportSnapshot(lastKnownDate);
+      const reportRows = getReportRows();
+      reportSummaryGrid.innerHTML = '';
+      reportDaysList.innerHTML = '';
+
+      const allCompleted = executionState.completedTasks || [];
+      const totalCompleted = reportRows.reduce((total, report) => total + report.completedTasks, 0);
+      const totalPlanned = reportRows.reduce((total, report) => total + report.plannedTasks, 0);
+      const overall = getConclusionPercentage(totalCompleted, totalPlanned);
+      [
+        ['Concluídas', String(totalCompleted)],
+        ['Programadas', String(totalPlanned)],
+        ['Constância', `${overall}%`]
+      ].forEach(([label, value]) => {
+        const card = document.createElement('div');
+        card.className = 'report-summary-card';
+        card.innerHTML = `<span>${label}</span><strong>${value}</strong>`;
+        reportSummaryGrid.append(card);
+      });
+
+      const dates = new Set(reportRows.map((row) => row.date));
+      allCompleted.forEach((task) => dates.add(task.completedDate));
+      const orderedDates = Array.from(dates).filter(Boolean).sort().reverse();
+
+      if (!orderedDates.length) {
+        reportDaysList.innerHTML = '<div class="report-day-card report-empty">Nenhuma tarefa concluída ou constância registrada ainda.</div>';
         return;
       }
 
-      reportRows.forEach((report) => {
-        const row = document.createElement('tr');
-        const dateCell = document.createElement('td');
-        const estimatedCell = document.createElement('td');
-        const conclusionCell = document.createElement('td');
+      orderedDates.forEach((dateValue) => {
+        const report = reportRows.find((row) => row.date === dateValue) || getDailyReportSnapshot(dateValue);
+        const completedTasks = getCompletedTasksForReportDate(dateValue);
+        const card = document.createElement('section');
+        card.className = 'report-day-card';
+        const head = document.createElement('div');
+        head.className = 'report-day-head';
+        const date = document.createElement('strong');
+        date.textContent = formatReportDate(dateValue);
+        const constancy = document.createElement('span');
+        constancy.className = 'report-constancy';
+        constancy.textContent = `${report.completedTasks}/${report.plannedTasks} · ${report.conclusion}%`;
+        head.append(date, constancy);
+        card.append(head);
 
-        dateCell.textContent = formatReportDate(report.date);
-        estimatedCell.textContent = `${report.completedTasks}/${report.plannedTasks}`;
-        conclusionCell.className = 'report-percent';
-        conclusionCell.textContent = `${report.conclusion}%`;
-
-        row.append(dateCell, estimatedCell, conclusionCell);
-        reportTableBody.append(row);
+        const list = document.createElement('ul');
+        list.className = 'report-completed-list';
+        if (!completedTasks.length) {
+          const empty = document.createElement('li');
+          empty.className = 'report-empty';
+          empty.textContent = report.completedTasks > 0
+            ? `${report.completedTasks} conclusão(ões) registrada(s) nesta versão antiga, sem detalhes nominais.`
+            : 'Nenhuma tarefa concluída neste dia.';
+          list.append(empty);
+        } else {
+          completedTasks.forEach((task) => {
+            const item = document.createElement('li');
+            item.className = 'report-completed-task';
+            const title = document.createElement('strong');
+            title.textContent = task.title;
+            const meta = document.createElement('span');
+            const details = [];
+            if (task.path && task.path !== task.title) details.push(task.path);
+            if (task.startTime && task.endTime) details.push(`${task.startTime}–${task.endTime}`);
+            else details.push('sem horário fixo');
+            details.push(`${getTaskBlocksLabel(task)} · ${formatDurationMinutes(task.durationMinutes || getTaskDurationMinutes(task))}`);
+            meta.textContent = details.join(' · ');
+            item.append(title, meta);
+            list.append(item);
+          });
+        }
+        card.append(list);
+        reportDaysList.append(card);
       });
     }
 
@@ -4606,15 +4911,40 @@
       return previousLength !== todayPlan.length;
     }
 
+    function normalizeCompletedTaskSnapshot(value) {
+      if (!value || typeof value !== 'object') return null;
+      const completedDate = normalizePlannedDate(value.completedDate || value.date);
+      const title = normalizeTaskTitle(value.title || '');
+      if (!completedDate || !title) return null;
+      return {
+        id: String(value.id || `completed-${completedDate}-${title}`),
+        sourceTaskId: typeof value.sourceTaskId === 'string' ? value.sourceTaskId : null,
+        title,
+        path: String(value.path || title),
+        completedDate,
+        scheduledDate: normalizePlannedDate(value.scheduledDate),
+        startTime: normalizeTime(value.startTime),
+        endTime: normalizeTime(value.endTime),
+        blocksRequired: normalizeBlocksRequired(value.blocksRequired),
+        durationMinutes: Math.max(0, Math.floor(Number(value.durationMinutes) || 0)),
+        recurrence: normalizeRecurrence(value.recurrence),
+        completedAt: typeof value.completedAt === 'string' ? value.completedAt : null
+      };
+    }
+
     function normalizeExecutionState(value) {
       const safe = value && typeof value === 'object' ? value : {};
       const dailyHistory = safe.dailyHistory && typeof safe.dailyHistory === 'object'
         ? safe.dailyHistory
         : {};
+      const completedTasks = Array.isArray(safe.completedTasks)
+        ? safe.completedTasks.map(normalizeCompletedTaskSnapshot).filter(Boolean)
+        : [];
 
       return {
         dailyHistory: { ...dailyHistory },
-        currentTaskId: typeof safe.currentTaskId === 'string' ? safe.currentTaskId : null
+        currentTaskId: typeof safe.currentTaskId === 'string' ? safe.currentTaskId : null,
+        completedTasks
       };
     }
 
@@ -4869,6 +5199,9 @@
       if (task.startTime && task.endTime) {
         parts.push(`${task.startTime}–${task.endTime}`);
         ariaParts.push(`horário: ${task.startTime} até ${task.endTime}`);
+      } else if (task.dueDate) {
+        parts.push('sem horário fixo');
+        ariaParts.push('sem horário fixo');
       }
       const blocks = normalizeBlocksRequired(task.blocksRequired);
       parts.push(`${getTaskBlocksLabel(task)} · ${formatDurationMinutes(getTaskDurationMinutes(task))}`);
@@ -4940,6 +5273,14 @@
       openDeleteTaskConfirmation(currentLevel);
     });
 
+    viewSubtaskQueueButton.addEventListener('click', () => openSubtaskQueue(currentLevel));
+    closeSubtaskQueueButton.addEventListener('click', () => {
+      const source = subtaskQueueSourceTaskId ? findTaskById(subtaskQueueSourceTaskId) : null;
+      if (source) currentLevel = source;
+      activateTab('planejamento');
+      renderCurrentLevel();
+    });
+
     confirmDeleteButton.addEventListener('click', () => {
       if (!pendingDeleteTask || !pendingDeleteTask.parent) {
         return;
@@ -4965,6 +5306,7 @@
       renderTodayTab();
       renderQueue();
       if (calendarWeekStart) renderCalendarWeek();
+      if (subtaskQueuePanel.classList.contains('active')) renderSubtaskQueueScreen();
       taskInput.focus();
     });
 
@@ -4975,6 +5317,8 @@
 
       const routineDay = getRoutineDayDefinitionForLevel(currentLevel);
       const isRoutineRoot = currentLevel.id === routineRootId;
+      const canViewSubtaskQueue = taskHasSubtasks(currentLevel) && !isRoutineRoot && !isRoutineStructureTask(currentLevel);
+      viewSubtaskQueueButton.classList.toggle('visible', canViewSubtaskQueue);
       const insideRoutineTask = Boolean(routineDay && !isRoutineDayStructureTask(currentLevel));
       const canCreateHere = !isRoutineRoot && !insideRoutineTask;
       taskForm.hidden = !canCreateHere;
@@ -5043,14 +5387,16 @@
       }) || null;
     }
 
-    function canScheduleTaskOnDate(task, dateValue, startTime, endTime, showAlert = false) {
+    function canScheduleTaskOnDate(task, dateValue, startTime, endTime, showAlert = false, durationOverrideMinutes = null) {
       const normalizedDate = normalizePlannedDate(dateValue);
       if (!normalizedDate) return true;
       const start = timeToMinutes(startTime);
       const end = timeToMinutes(endTime);
-      const duration = start !== null && end !== null && end > start
-        ? end - start
-        : getTaskDurationMinutes(task);
+      const duration = Number.isFinite(Number(durationOverrideMinutes)) && Number(durationOverrideMinutes) > 0
+        ? Number(durationOverrideMinutes)
+        : start !== null && end !== null && end > start
+          ? end - start
+          : getTaskDurationMinutes(task);
       const available = getDayAvailableMinutes(normalizedDate, task);
 
       const conflict = getScheduleConflict(normalizedDate, startTime, endTime, task);
@@ -5077,10 +5423,30 @@
       editTaskTimeSummary.hidden = !hasDate;
       editTaskBlocksInput.disabled = !hasDate;
       if (!hasDate) {
-        editTaskBlocksInput.value = '1';
+        editTaskBlocksInput.readOnly = false;
+        editTaskBlocksInput.removeAttribute('aria-readonly');
+        editTaskBlocksInput.value = String(normalizeBlocksRequired(editTargetTask?.blocksRequired));
         return;
       }
-      const adjusted = adjustTimeRangeToBlocks(editTaskStartTimeInput.value, editTaskEndTimeInput.value);
+
+      const rawStart = normalizeTime(editTaskStartTimeInput.value);
+      const rawEnd = normalizeTime(editTaskEndTimeInput.value);
+      if (!rawStart && !rawEnd) {
+        editTaskBlocksInput.readOnly = false;
+        editTaskBlocksInput.removeAttribute('aria-readonly');
+        editTaskBlocksInput.value = String(normalizeBlocksRequired(editTaskBlocksInput.value || editTargetTask?.blocksRequired));
+        editTaskTimeSummary.textContent = `Sem horário fixo. Informe os blocos necessários manualmente; cada bloco possui ${normalizeBlockDurationMinutes(blockDurationMinutes)} min.`;
+        return;
+      }
+
+      editTaskBlocksInput.readOnly = true;
+      editTaskBlocksInput.setAttribute('aria-readonly', 'true');
+      if (!rawStart || !rawEnd) {
+        editTaskTimeSummary.textContent = 'Preencha os dois horários ou deixe os dois vazios.';
+        return;
+      }
+
+      const adjusted = adjustTimeRangeToBlocks(rawStart, rawEnd);
       if (!adjusted) {
         editTaskBlocksInput.value = String(normalizeBlocksRequired(editTargetTask?.blocksRequired));
         editTaskTimeSummary.textContent = `Informe início e fim válidos. Os horários serão encaixados na grade de ${normalizeBlockDurationMinutes(blockDurationMinutes)} min.`;
@@ -5152,6 +5518,8 @@
       editTaskTimeFields.hidden = false;
       editTaskTimeSummary.hidden = false;
       editTaskBlocksInput.disabled = false;
+      editTaskBlocksInput.readOnly = false;
+      editTaskBlocksInput.removeAttribute('aria-readonly');
       editTargetTask = null;
       taskInput.focus();
     }
@@ -5167,6 +5535,11 @@
     editTaskDateInput.addEventListener('change', updateEditTaskTimePreview);
     editTaskStartTimeInput.addEventListener('input', updateEditTaskTimePreview);
     editTaskEndTimeInput.addEventListener('input', updateEditTaskTimePreview);
+    editTaskBlocksInput.addEventListener('input', () => {
+      if (!normalizeTime(editTaskStartTimeInput.value) && !normalizeTime(editTaskEndTimeInput.value)) {
+        editTaskBlocksInput.value = String(normalizeBlocksRequired(editTaskBlocksInput.value));
+      }
+    });
 
     editTaskModal.addEventListener('click', (event) => {
       if (event.target === editTaskModal) {
@@ -5185,19 +5558,34 @@
       let adjustedRange = null;
 
       if (!hasSubtasks && newDueDate) {
-        if (!normalizeTime(editTaskStartTimeInput.value) || !normalizeTime(editTaskEndTimeInput.value)) {
-          window.alert('Para agendar a tarefa, informe a hora de início e a hora de fim.');
+        const rawStart = normalizeTime(editTaskStartTimeInput.value);
+        const rawEnd = normalizeTime(editTaskEndTimeInput.value);
+        if (Boolean(rawStart) !== Boolean(rawEnd)) {
+          window.alert('Preencha Hora início e Hora fim juntas ou deixe as duas vazias.');
           return;
         }
-        adjustedRange = adjustTimeRangeToBlocks(editTaskStartTimeInput.value, editTaskEndTimeInput.value);
-        if (!adjustedRange) {
-          window.alert('A hora fim deve ser posterior à hora início.');
-          return;
+        if (rawStart && rawEnd) {
+          adjustedRange = adjustTimeRangeToBlocks(rawStart, rawEnd);
+          if (!adjustedRange) {
+            window.alert('A hora fim deve ser posterior à hora início.');
+            return;
+          }
         }
         if (routineDay) {
           newDueDate = getDateOnOrAfterForWeekday(newDueDate, routineDay.weekday);
         }
-        if (!canScheduleTaskOnDate(editTargetTask, newDueDate, adjustedRange.startTime, adjustedRange.endTime, true)) return;
+        const manualBlocks = normalizeBlocksRequired(editTaskBlocksInput.value);
+        const durationOverride = adjustedRange
+          ? adjustedRange.durationMinutes
+          : manualBlocks * normalizeBlockDurationMinutes(blockDurationMinutes);
+        if (!canScheduleTaskOnDate(
+          editTargetTask,
+          newDueDate,
+          adjustedRange?.startTime || null,
+          adjustedRange?.endTime || null,
+          true,
+          durationOverride
+        )) return;
       }
 
       editTargetTask.title = newTitle;
@@ -5206,9 +5594,11 @@
       } else if (newDueDate) {
         editTargetTask.dueDate = newDueDate;
         editTargetTask.plannedDate = newDueDate;
-        editTargetTask.startTime = adjustedRange.startTime;
-        editTargetTask.endTime = adjustedRange.endTime;
-        editTargetTask.blocksRequired = adjustedRange.blocksRequired;
+        editTargetTask.startTime = adjustedRange?.startTime || null;
+        editTargetTask.endTime = adjustedRange?.endTime || null;
+        editTargetTask.blocksRequired = adjustedRange
+          ? adjustedRange.blocksRequired
+          : normalizeBlocksRequired(editTaskBlocksInput.value);
         editTargetTask.recurrence = routineDay
           ? (editTaskRecurrenceSelect.value === 'biweekly' ? 'biweekly' : 'weekly')
           : normalizeRecurrence(editTaskRecurrenceSelect.value);
@@ -5230,6 +5620,8 @@
       renderTodayTab();
       renderQueue();
       if (calendarWeekStart) renderCalendarWeek();
+      if (subtaskQueuePanel.classList.contains('active')) renderSubtaskQueueScreen();
+      if (reportPanel.classList.contains('active')) renderReportScreen();
     });
 
     editTaskNameInput.addEventListener('keydown', (event) => {
@@ -5259,6 +5651,7 @@
     function getQueueTaskMeta(task) {
       const details = [getTaskBlocksLabel(task), formatDurationMinutes(getTaskDurationMinutes(task))];
       if (task.startTime && task.endTime) details.push(`${task.startTime}–${task.endTime}`);
+      else if (getExecutionScheduledDate(task)) details.push('sem horário fixo');
       if (task.recurrence) details.push(getRecurrenceLabel(task.recurrence));
       if (task.checked) details.push('marcada');
       return details.join(' · ');
@@ -5348,6 +5741,83 @@
       return item;
     }
 
+    function getDescendantLeafTasks(task) {
+      if (!task || !Array.isArray(task.children)) return [];
+      return task.children.flatMap((child) => taskHasSubtasks(child)
+        ? getDescendantLeafTasks(child)
+        : [child]);
+    }
+
+    function getSubtaskQueueSorted(task) {
+      return getDescendantLeafTasks(task).sort((firstTask, secondTask) => {
+        const firstDate = getExecutionScheduledDate(firstTask);
+        const secondDate = getExecutionScheduledDate(secondTask);
+        if (firstDate || secondDate) {
+          if (!firstDate) return 1;
+          if (!secondDate) return -1;
+          const dateComparison = firstDate.localeCompare(secondDate);
+          if (dateComparison !== 0) return dateComparison;
+        }
+        const firstStart = timeToMinutes(firstTask.startTime);
+        const secondStart = timeToMinutes(secondTask.startTime);
+        if (firstStart !== null || secondStart !== null) {
+          if (firstStart === null) return 1;
+          if (secondStart === null) return -1;
+          if (firstStart !== secondStart) return firstStart - secondStart;
+        }
+        return getTaskPath(firstTask).localeCompare(getTaskPath(secondTask), 'pt-BR');
+      });
+    }
+
+    function createSubtaskQueueItem(task) {
+      if (task.dueDate) return createQueueItem(task);
+      const item = document.createElement('li');
+      item.className = 'queue-item queue-item-clickable';
+      const dateBox = document.createElement('div');
+      dateBox.className = 'queue-date';
+      dateBox.innerHTML = '<span class="queue-date-label">Sem data</span><span class="queue-date-relative">não agendada</span>';
+      const main = document.createElement('div');
+      main.className = 'queue-main';
+      const title = document.createElement('span');
+      title.className = 'queue-title';
+      applyTaskNamePresentation(title, task);
+      const path = document.createElement('span');
+      path.className = 'queue-path';
+      path.textContent = getTaskPath(task);
+      main.append(title, path);
+      const meta = document.createElement('div');
+      meta.className = 'queue-meta';
+      meta.textContent = `${getTaskBlocksLabel(task)} · ${formatDurationMinutes(getTaskDurationMinutes(task))}`;
+      item.append(dateBox, main, meta);
+      item.addEventListener('click', () => openEditTaskModal(task));
+      return item;
+    }
+
+    function renderSubtaskQueueScreen() {
+      const source = subtaskQueueSourceTaskId ? findTaskById(subtaskQueueSourceTaskId) : null;
+      subtaskQueueList.innerHTML = '';
+      if (!source || !taskHasSubtasks(source) || source.id === routineRootId || isRoutineStructureTask(source)) {
+        subtaskQueueTitle.textContent = 'Fila de subtarefas';
+        subtaskQueueContext.textContent = 'A tarefa selecionada não está mais disponível.';
+        subtaskQueueList.innerHTML = '<li class="queue-empty">Nenhuma subtarefa disponível.</li>';
+        return;
+      }
+      subtaskQueueTitle.textContent = `Fila · ${getTaskDisplayTitle(source)}`;
+      subtaskQueueContext.textContent = getTaskPath(source);
+      const tasks = getSubtaskQueueSorted(source);
+      if (!tasks.length) {
+        subtaskQueueList.innerHTML = '<li class="queue-empty">Nenhuma subtarefa disponível.</li>';
+        return;
+      }
+      tasks.forEach((task) => subtaskQueueList.append(createSubtaskQueueItem(task)));
+    }
+
+    function openSubtaskQueue(task) {
+      if (!task || !taskHasSubtasks(task) || task.id === routineRootId || isRoutineStructureTask(task)) return;
+      subtaskQueueSourceTaskId = task.id;
+      activateTab('subtask-queue');
+    }
+
     function renderQueue() {
       const tasks = getDatedTasksSorted();
       queueList.innerHTML = '';
@@ -5398,6 +5868,7 @@
     function getCalendarTaskMeta(task) {
       const details = [getTaskBlocksLabel(task), formatDurationMinutes(getTaskDurationMinutes(task))];
       if (task.startTime && task.endTime) details.unshift(`${task.startTime}–${task.endTime}`);
+      else details.unshift('Sem horário fixo');
       if (isRoutineRecurringTask(task)) {
         details.push(`Rotina ${getRecurrenceLabel(task.recurrence).toLowerCase()}`);
       } else if (task.recurrence) {
@@ -5623,25 +6094,15 @@
       renderCalendarWeek();
     });
 
-    function closeReportModal() {
-      reportModal.classList.remove('visible');
-      reportButton.focus();
-    }
-
     reportButton.addEventListener('click', () => {
       saveDailyReportSnapshot(lastKnownDate);
       saveAppState();
-      renderReportTable();
-      reportModal.classList.add('visible');
-      closeReportButton.focus();
+      activateTab('relatorio');
     });
 
-    closeReportButton.addEventListener('click', closeReportModal);
-
-    reportModal.addEventListener('click', (event) => {
-      if (event.target === reportModal) {
-        closeReportModal();
-      }
+    closeReportButton.addEventListener('click', () => {
+      activateTab('configuracoes');
+      reportButton.focus();
     });
 
     function updateBlockDurationControls() {
@@ -5669,6 +6130,8 @@
       renderTodayTab();
       renderQueue();
       if (calendarWeekStart) renderCalendarWeek();
+      if (subtaskQueuePanel.classList.contains('active')) renderSubtaskQueueScreen();
+      if (reportPanel.classList.contains('active')) renderReportScreen();
     });
 
     blockDurationMinutesInput?.addEventListener('keydown', (event) => {
@@ -5686,8 +6149,51 @@
     themePaletteButtons.forEach((button) => {
       button.addEventListener('click', () => {
         applyPalette(button.dataset.palette);
+        if (button.dataset.palette === 'deepdark') applyTheme('dark');
         saveAppState();
       });
+    });
+
+    function removeCheckedCompletedTasks(level = rootLevel) {
+      level.children = level.children.filter((task) => {
+        if (isRoutineStructureTask(task)) {
+          removeCheckedCompletedTasks(task);
+          return true;
+        }
+        removeCheckedCompletedTasks(task);
+        return !(task.checked && !taskHasSubtasks(task));
+      });
+    }
+
+    function closeClearCompletedModal() {
+      clearCompletedModal.classList.remove('visible');
+      clearCompletedButton.focus();
+    }
+
+    clearCompletedButton.addEventListener('click', () => {
+      clearCompletedModal.classList.add('visible');
+      confirmClearCompletedButton.focus();
+    });
+
+    cancelClearCompletedButton.addEventListener('click', closeClearCompletedModal);
+    clearCompletedModal.addEventListener('click', (event) => {
+      if (event.target === clearCompletedModal) closeClearCompletedModal();
+    });
+
+    confirmClearCompletedButton.addEventListener('click', () => {
+      executionState.completedTasks = [];
+      removeCheckedCompletedTasks();
+      cleanupTodayPlan();
+      syncTodayPlanFromTaskPlans();
+      clearCompletedModal.classList.remove('visible');
+      saveAppState();
+      renderCurrentLevel();
+      renderTodayTab();
+      renderQueue();
+      if (calendarWeekStart) renderCalendarWeek();
+      if (subtaskQueuePanel.classList.contains('active')) renderSubtaskQueueScreen();
+      if (reportPanel.classList.contains('active')) renderReportScreen();
+      clearCompletedButton.focus();
     });
 
     function closeClearDataModal() {

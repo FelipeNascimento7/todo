@@ -1,3 +1,21 @@
+# Configuração privada (preservar .env.example como documentação)
 .env
+.env.*
+!.env.example
+
+# Dados persistentes e bancos locais
+data/
+uploads/
+backups/
+logs/
+*.db
+*.sqlite
+*.sqlite3
+
+# Dependências e arquivos temporários
 node_modules/
+vendor/
+.venv/
+__pycache__/
 *.log
+.DS_Store
